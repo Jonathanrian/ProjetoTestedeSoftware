@@ -8,4 +8,39 @@ public class Produto {
     private String fabricante;
     private int desconto;
     //private Image imagem;
+
+    public boolean exibirDetalhes(){
+        try {
+            //Colocar uma forma legal de imprimir os detalhes talvez?
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public int getId() {
+        return id;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public double getPreco() {
+        return preco;
+    }
+    public String getCategoria() {
+        return categoria;
+    }
+    public int getEstoque() {
+        return estoque;
+    }
+    public String getDescricao() {
+        return descricao;
+    }
+    public String getFabricante() {
+        return fabricante;
+    }
+    public int getDesconto() {
+        return desconto;
+    }
+    
 }
