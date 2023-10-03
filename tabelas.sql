@@ -4,18 +4,21 @@
 
 CREATE TABLE IF NOT EXISTS public.cliente
 (
-    id_cliente integer NOT NULL DEFAULT nextval('cliente_id_cliente_seq'::regclass),
+    id_cliente integer NOT NULL DEFAULT 'nextval('cliente_id_cliente_seq'::regclass)',
     nome_completo character varying(50) COLLATE pg_catalog."default" NOT NULL,
     cpf character(11) COLLATE pg_catalog."default" NOT NULL,
     email character varying(50) COLLATE pg_catalog."default" NOT NULL,
     telefone character(11) COLLATE pg_catalog."default",
+    usuario character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    senha character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    datanasc date NOT NULL,
     CONSTRAINT cliente_pkey PRIMARY KEY (id_cliente)
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.cliente
-    OWNER to postgres;
+    OWNER to fsbnypxo;
 
 
 -- Table: public.carrinho
