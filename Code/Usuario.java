@@ -1,3 +1,4 @@
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -12,20 +13,59 @@ public class Usuario {
     private Endereco endereco;
     private LocalDate dataNasc;
     
-    public Usuario(int id, String nome_completo, String cpf, String email, String telefone, String senha,
-            String usuario, Endereco endereco, LocalDate dataNasc) {
-        this.id = id;
+    public Usuario(String nome_completo, String cpf, String email, String telefone, String senha,
+            String usuario, LocalDate dataNasc) {
         this.nome_completo = nome_completo;
         this.cpf = cpf;
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
         this.usuario = usuario;
-        this.endereco = endereco;
         this.dataNasc = dataNasc;
     }
+    
+    public boolean cadastrar(){
+        try {
 
-    public boolean Login(){
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            if (this.validarDados()) {
+
+                PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM cliente WHERE cpf = ?");
+
+                pstmt.setString(1, cpf);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (!rs.next()) {
+                    pstmt = connection.prepareStatement(
+                        "INSERT INTO " 
+                      + "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" 
+                      + "VALUES(?, ?, ?, ?, ?, ?, ?)");
+
+                    pstmt.setString(1, getNome_completo());
+                    pstmt.setString(2, getCpf());
+                    pstmt.setString(3, getEmail());
+                    pstmt.setString(4, getTelefone());
+                    pstmt.setString(5, getUsuario());
+                    pstmt.setString(6, getSenha());
+                    pstmt.setDate(7, Date.valueOf(dataNasc));
+                    pstmt.executeUpdate();
+
+                    return true;
+                }
+
+                return false;
+                
+            }
+            
+            return false;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean login(){
         try {
             return true;
         } catch (Exception e) {
@@ -128,6 +168,14 @@ public class Usuario {
     }
     public void setDataNasc(LocalDate dataNasc) {
         this.dataNasc = dataNasc;
+    }
+
+    public static void main(String[] args) {
+        LocalDate data = LocalDate.of(2003, 7, 27);
+        Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719304", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
+
+        System.out.println(cliente.cadastrar());
+        
     }
 
 }
