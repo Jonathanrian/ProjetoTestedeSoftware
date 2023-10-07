@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.carrinho
     cliente integer NOT NULL,
     produto integer NOT NULL,
     quantidade integer NOT NULL,
-    CONSTRAINT carrinho_pkey PRIMARY KEY (cliente),
+    CONSTRAINT carrinho_pkey PRIMARY KEY (cliente, produto),
     CONSTRAINT carrinho_cliente_fkey FOREIGN KEY (cliente)
         REFERENCES public.cliente (id_cliente) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.carrinho
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.carrinho
-    OWNER to postgres;
+    OWNER to fsbnypxo;
 
 
 -- Table: public.produto
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.produto
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.produto
-    OWNER to postgres;
+    OWNER to fsbnypxo;
 
 
 -- Table: public.pedido
@@ -77,7 +77,6 @@ ALTER TABLE IF EXISTS public.produto
 CREATE TABLE IF NOT EXISTS public.pedido
 (
     id_pedido integer NOT NULL DEFAULT nextval('pedido_id_pedido_seq'::regclass),
-    produtos integer NOT NULL,
     cliente integer NOT NULL,
     status character varying(15) COLLATE pg_catalog."default" NOT NULL,
     data_criacao date NOT NULL,
@@ -96,10 +95,6 @@ CREATE TABLE IF NOT EXISTS public.pedido
         REFERENCES public.endereco (id_endereco) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION,
-    CONSTRAINT pedido_produtos_fkey FOREIGN KEY (produtos)
-        REFERENCES public.carrinho (cliente) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
     CONSTRAINT pedido_tipo_envio_fkey FOREIGN KEY (tipo_envio)
         REFERENCES public.envio (id_envio) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -109,7 +104,7 @@ CREATE TABLE IF NOT EXISTS public.pedido
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.pedido
-    OWNER to postgres;
+    OWNER to fsbnypxo;
 
 
 -- Table: public.envio
@@ -127,7 +122,7 @@ CREATE TABLE IF NOT EXISTS public.envio
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.envio
-    OWNER to postgres;
+    OWNER to fsbnypxo;
 
 
 -- Table: public.endereco
@@ -155,4 +150,28 @@ CREATE TABLE IF NOT EXISTS public.endereco
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.endereco
-    OWNER to postgres;
+    OWNER to fsbnypxo;
+
+-- Table: public.produtos_pedido
+
+-- DROP TABLE IF EXISTS public.produtos_pedido;
+
+CREATE TABLE IF NOT EXISTS public.produtos_pedido
+(
+    id_pedido integer NOT NULL,
+    id_produto integer NOT NULL,
+    CONSTRAINT produtos_pedido_pkey PRIMARY KEY (id_pedido, id_produto),
+    CONSTRAINT produtos_pedido_id_pedido_fkey FOREIGN KEY (id_pedido)
+        REFERENCES public.pedido (id_pedido) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT produtos_pedido_id_produto_fkey FOREIGN KEY (id_produto)
+        REFERENCES public.produto (id_produto) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.produtos_pedido
+    OWNER to fsbnypxo;
