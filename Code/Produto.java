@@ -9,6 +9,18 @@ public class Produto {
     private int desconto;
     //private Image imagem;
 
+    public Produto(int id, String nome, double preco, String categoria, int estoque, String descricao,
+            String fabricante, int desconto) {
+        this.id = id;
+        this.nome = nome;
+        this.preco = preco;
+        this.categoria = categoria;
+        this.estoque = estoque;
+        this.descricao = descricao;
+        this.fabricante = fabricante;
+        this.desconto = desconto;
+    }
+
     public boolean exibirDetalhes(){
         try {
             //Colocar uma forma legal de imprimir os detalhes talvez?
@@ -41,6 +53,12 @@ public class Produto {
     }
     public int getDesconto() {
         return desconto;
+    }
+
+    @Override
+    public String toString() {
+        return "Produto [id=" + id + ", nome=" + nome + ", preco=" + preco + ", categoria=" + categoria + ", estoque="
+                + estoque + ", descricao=" + descricao + ", fabricante=" + fabricante + ", desconto=" + desconto + "]";
     }
     
 }
