@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -142,11 +143,15 @@ public class Carrinho {
 
     public int quantidadeProduto(Produto produto){
         try {
-            if (this.produtos.containsKey(produto)) {
-                return this.produtos.get(produto);
-            } else{
-                return -1;
+
+            for (Produto key : this.produtos.keySet()) {
+                if (key.getId() == produto.getId()) {
+                    return this.produtos.get(key);
+                }
             }
+
+            return -1;
+
         } catch (Exception e) {
             return -1;
         }
@@ -180,12 +185,16 @@ public class Carrinho {
         }
     }
 
-    public boolean realizarPedido(){
+    public Pedido realizarPedido(){
         try {
+
+            Pedido pedido;
+
+            pedido = new Pedido(produtos, cliente, this.calcularTotal(), LocalDate.now());
                 
-            return true;
+            return pedido;
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
@@ -300,6 +309,8 @@ public class Carrinho {
         Produto produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
 
         carrinho.adicionarItem(produto);
+
+        System.out.println(carrinho.quantidadeProduto(produto));
 
         carrinho.esvaziarCarrinho();
 
