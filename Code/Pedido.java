@@ -1,11 +1,13 @@
+import java.sql.*;
 import java.time.LocalDate;
+import java.util.HashMap;
 
 public class Pedido {
     private int numPedido;
-    private Carrinho produtos;
+    private HashMap<Produto, Integer> produtos;
     private String status;
     private Usuario usuario;
-    private double valorTotal;
+    private double valorProdutos;
     private String formaPagamento;
     private Endereco endereco;
     private LocalDate dataCriacao;
@@ -13,6 +15,14 @@ public class Pedido {
     private String tipoEnvio;
     private double custoEnvio;
     private double valorFrete;
+    private double valorTotal;
+
+    public Pedido(HashMap<Produto, Integer> produtos, Usuario usuario, double valorProdutos, LocalDate dataCriacao) {
+        this.produtos = produtos;
+        this.usuario = usuario;
+        this.valorProdutos = valorProdutos;
+        this.dataCriacao = dataCriacao;
+    }
 
     public boolean exibirDetalhes(){
         try {
@@ -31,8 +41,11 @@ public class Pedido {
         }
     }
 
-    public boolean editarFormaPagamento(){
+    public boolean editarFormaPagamento(String novaFormaPagamento){
         try {
+
+            setFormaPagamento(novaFormaPagamento);
+
             return true;
         } catch (Exception e) {
             return false;
@@ -41,6 +54,16 @@ public class Pedido {
 
     public boolean cancelarPedido(){
         try {
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "DELETE FROM " + 
+                "pedido WHERE id_pedido = ?");
+
+            pstmt.setInt(1, getNumPedido());
+            pstmt.executeUpdate();
+
             return true;
         } catch (Exception e) {
             return false;
@@ -63,10 +86,10 @@ public class Pedido {
     public void setNumPedido(int numPedido) {
         this.numPedido = numPedido;
     }
-    public Carrinho getProdutos() {
+    public HashMap<Produto, Integer> getProdutos() {
         return produtos;
     }
-    public void setProdutos(Carrinho produtos) {
+    public void setProdutos(HashMap<Produto, Integer> produtos) {
         this.produtos = produtos;
     }
     public String getStatus() {
@@ -128,5 +151,21 @@ public class Pedido {
     }
     public void setValorFrete(double valorFrete) {
         this.valorFrete = valorFrete;
+    }
+
+    public double getValorProdutos() {
+        return valorProdutos;
+    }
+
+    public void setValorProdutos(double valorProdutos) {
+        this.valorProdutos = valorProdutos;
+    }
+
+    @Override
+    public String toString() {
+        return "Pedido [numPedido=" + numPedido + ", produtos=" + produtos + ", status=" + status + ", usuario="
+                + usuario + ", valorTotal=" + valorTotal + ", formaPagamento=" + formaPagamento + ", endereco="
+                + endereco + ", dataCriacao=" + dataCriacao + ", dataEnvio=" + dataEnvio + ", tipoEnvio=" + tipoEnvio
+                + ", custoEnvio=" + custoEnvio + ", valorFrete=" + valorFrete + "]";
     }
 }
