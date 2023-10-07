@@ -10,7 +10,7 @@ public class Usuario {
     private String telefone;
     private String senha;
     private String usuario;
-    private Endereco endereco;
+    private ArrayList<Endereco> enderecos;
     private LocalDate dataNasc;
     
     public Usuario(String nome_completo, String cpf, String email, String telefone, String senha,
@@ -23,7 +23,20 @@ public class Usuario {
         this.usuario = usuario;
         this.dataNasc = dataNasc;
     }
-    
+
+    public Usuario(int id, String nome_completo, String cpf, String email, String telefone, String senha,
+            String usuario, ArrayList<Endereco> endereco, LocalDate dataNasc) {
+        this.id = id;
+        this.nome_completo = nome_completo;
+        this.cpf = cpf;
+        this.email = email;
+        this.telefone = telefone;
+        this.senha = senha;
+        this.usuario = usuario;
+        this.enderecos = endereco;
+        this.dataNasc = dataNasc;
+    }
+
     public boolean cadastrar(){
         try {
 
@@ -68,7 +81,7 @@ public class Usuario {
         }
     }
 
-    public static boolean login(String usuario, String senha){
+    public static Usuario login(String usuario, String senha){
         try {
 
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
@@ -82,12 +95,50 @@ public class Usuario {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return true;
+
+                Usuario cliente;
+                int id = rs.getInt(1);
+                String nome_completo = rs.getString(2);
+                String cpf = rs.getString(3);
+                String email = rs.getString(4);
+                String telefone = rs.getString(5);
+                ArrayList<Endereco> enderecos = new ArrayList<>();
+                java.sql.Date dataSql = rs.getDate(8);
+                LocalDate dataNasc = dataSql.toLocalDate();
+
+                PreparedStatement pstmt2 = connection.prepareStatement(
+                    "SELECT * FROM endereco " +
+                    "WHERE cliente = ?");
+                
+                pstmt2.setInt(1, id);
+
+                ResultSet rs2 = pstmt2.executeQuery();
+
+                while (rs2.next()) {
+                    Endereco endereco;
+
+                    int id_endereco = rs2.getInt(1);
+                    String estado = rs2.getString(3);
+                    String cidade = rs2.getString(4);
+                    String bairro = rs2.getString(5);
+                    String rua = rs2.getString(6);
+                    int numero = rs2.getInt(7);
+                    String complemento = rs2.getString(8);
+                    String cep = rs2.getString(9);
+
+                    endereco = new Endereco(id_endereco, estado, cidade, bairro, rua, complemento, cep, numero);
+                    enderecos.add(endereco);
+                }
+
+                cliente = new Usuario(id, nome_completo, cpf, email, telefone, senha, usuario, enderecos, dataNasc);
+                
+                return cliente;
             }
 
-            return false;
+            return null;
         } catch (Exception e) {
-            return false;
+            System.out.println(e);
+            return null;
         }
     }
 
@@ -119,7 +170,9 @@ public class Usuario {
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
-            PreparedStatement pstmt = connection.prepareStatement("DELETE FROM cliente WHERE cpf = ?");
+            PreparedStatement pstmt = connection.prepareStatement(
+                "DELETE FROM " + 
+                "cliente WHERE cpf = ?");
 
             pstmt.setString(1, getCpf());
             pstmt.executeUpdate();
@@ -183,11 +236,11 @@ public class Usuario {
     public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
-    public Endereco getEndereco() {
-        return endereco;
+    public ArrayList<Endereco> getEnderecos() {
+        return enderecos;
     }
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public void setEnderecos(ArrayList<Endereco> endereco) {
+        this.enderecos = endereco;
     }
     public LocalDate getDataNasc() {
         return dataNasc;
@@ -196,11 +249,18 @@ public class Usuario {
         this.dataNasc = dataNasc;
     }
 
-    public static void main(String[] args) {
-        LocalDate data = LocalDate.of(2003, 7, 27);
-        Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
+    @Override
+    public String toString() {
+        return "Usuario [id=" + id + ", nome_completo=" + nome_completo + ", cpf=" + cpf + ", email=" + email
+                + ", telefone=" + telefone + ", senha=" + senha + ", usuario=" + usuario + ", enderecos=" + enderecos
+                + ", dataNasc=" + dataNasc + "]";
+    }
 
-        System.out.println(cliente.excluirUsuario());
+    public static void main(String[] args) {
+        // LocalDate data = LocalDate.of(2003, 7, 27);
+        // Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
+
+        System.out.println(Usuario.login("RenanCosta", "renan123"));
         
     }
 
