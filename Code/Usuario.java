@@ -31,16 +31,19 @@ public class Usuario {
 
             if (this.validarDados()) {
 
-                PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM cliente WHERE cpf = ?");
+                PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM " + 
+                    "cliente WHERE cpf = ? OR usuario = ?");
 
-                pstmt.setString(1, cpf);
+                pstmt.setString(1, getCpf());
+                pstmt.setString(2, getUsuario());
                 ResultSet rs = pstmt.executeQuery();
 
                 if (!rs.next()) {
                     pstmt = connection.prepareStatement(
-                        "INSERT INTO " 
-                      + "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" 
-                      + "VALUES(?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO " + 
+                        "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" + 
+                        "VALUES(?, ?, ?, ?, ?, ?, ?)");
 
                     pstmt.setString(1, getNome_completo());
                     pstmt.setString(2, getCpf());
@@ -65,9 +68,24 @@ public class Usuario {
         }
     }
 
-    public boolean login(){
+    public static boolean login(String usuario, String senha){
         try {
-            return true;
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " + 
+                "cliente WHERE usuario = ? AND senha = ?");
+
+            pstmt.setString(1, usuario);
+            pstmt.setString(2, senha);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return true;
+            }
+
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -99,8 +117,16 @@ public class Usuario {
 
     public boolean excluirUsuario(){
         try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement("DELETE FROM cliente WHERE cpf = ?");
+
+            pstmt.setString(1, getCpf());
+            pstmt.executeUpdate();
+
             return true;
         } catch (Exception e) {
+            System.out.println(e);
             return false;
         }
     }
@@ -172,9 +198,9 @@ public class Usuario {
 
     public static void main(String[] args) {
         LocalDate data = LocalDate.of(2003, 7, 27);
-        Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719304", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
+        Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
 
-        System.out.println(cliente.cadastrar());
+        System.out.println(cliente.excluirUsuario());
         
     }
 
