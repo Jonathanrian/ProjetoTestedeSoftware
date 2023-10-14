@@ -60,14 +60,14 @@ public class Usuario {
                         "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" + 
                         "VALUES(?, ?, ?, ?, ?, ?, ?)");
 
-                    pstmt.setString(1, getNome_completo());
-                    pstmt.setString(2, getCpf());
-                    pstmt.setString(3, getEmail());
-                    pstmt.setString(4, getTelefone());
-                    pstmt.setString(5, getUsuario());
-                    pstmt.setString(6, getSenha());
-                    pstmt.setDate(7, Date.valueOf(dataNasc));
-                    pstmt.executeUpdate();
+                        pstmt.setString(1, getNome_completo());
+                        pstmt.setString(2, getCpf());
+                        pstmt.setString(3, getEmail());
+                        pstmt.setString(4, getTelefone());
+                        pstmt.setString(5, getUsuario());
+                        pstmt.setString(6, getSenha());
+                        pstmt.setDate(7, Date.valueOf(dataNasc));
+                        pstmt.executeUpdate();
 
                     return true;
                 }
@@ -79,6 +79,7 @@ public class Usuario {
             return false;
 
         } catch (Exception e) {
+            System.out.println(e);
             return false;
         }
     }
@@ -258,13 +259,4 @@ public class Usuario {
                 + ", dataNasc=" + dataNasc + "]";
     }
 
-    public static void main(String[] args) {
-        // LocalDate data = LocalDate.of(2003, 7, 27);
-        // Usuario cliente = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "renanleitedacosta@gmail.com", null, "renan123", "RenanCosta", data);
-
-        System.out.println(Usuario.login("RenanCosta", "renan123"));
-        
-    }
-
 }
-
