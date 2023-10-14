@@ -15,9 +15,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 
-/**
- * Unit test for simple App.
- */
 class CarrinhoTest {
 
     private Carrinho carrinho;
