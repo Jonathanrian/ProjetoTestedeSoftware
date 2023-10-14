@@ -3,6 +3,14 @@ package com.test_project;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+
+import br.com.caelum.stella.validation.CPFValidator;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 public class Usuario {
     private int id;
@@ -147,6 +155,7 @@ public class Usuario {
 
     public boolean validarDados(){
         try {
+            
             return true;
         } catch (Exception e) {
             return false;
@@ -200,56 +209,169 @@ public class Usuario {
     public int getId() {
         return id;
     }
-    public void setId(int id) {
+    public boolean setId(int id) {
         this.id = id;
+        return true;
     }
     public String getNome_completo() {
         return nome_completo;
     }
-    public void setNome_completo(String nome_completo) {
-        this.nome_completo = nome_completo;
+    public boolean setNome_completo(String nome_completo) {
+        if (nome_completo == null) {
+            return false; // Não deve ser nulo
+        }
+        
+        // Comprimento mínimo e máximo
+        if (nome_completo.length() < 4 || nome_completo.length() > 100) {
+            return false;
+        }
+        
+        // Caracteres válidos (permite letras, espaços, hífens e apóstrofos)
+        if (!nome_completo.matches("^[\\p{L}\\s'-]+$")) {
+            return false;
+        }
+        
+        // Evita números
+        if (nome_completo.matches(".*\\d.*")) {
+            return false;
+        }
+        
+        return true;
     }
     public String getCpf() {
         return cpf;
     }
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public boolean setCpf(String cpf) {
+        CPFValidator cpfValidator = new CPFValidator(); 
+        try {
+            if (cpf == null) {
+                return false; // Não deve ser nulo
+            }
+
+            // O cpfValidator faz a validação do CPF, caso seja inválido irá gerar uma exceção.
+            cpfValidator.assertValid(cpf); 
+            
+            this.cpf = cpf;
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
     public String getEmail() {
         return email;
     }
-    public void setEmail(String email) {
-        this.email = email;
+    public boolean setEmail(String email) {
+        try {
+            if (email == null) {
+                return false; // Não deve ser nulo
+            }
+
+            // O InternetAddress faz a validação do email, caso seja inválido irá gerar uma exceção.
+            InternetAddress emailAddr = new InternetAddress(email); 
+            emailAddr.validate();
+            this.email = email;
+            return true;
+
+        } catch (AddressException e) {
+            return false;
+        }
     }
     public String getTelefone() {
         return telefone;
     }
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
+    public boolean setTelefone(String telefone, String codigoPais) {
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+        try {
+            // O telefone pode ser nulo então ele armazena na variável e retorna verdadeiro
+            if (telefone == null) {
+                this.telefone = telefone;
+                return true;
+            }
+            // O InternetAddress faz a validação do telefone, caso seja inválido irá gerar uma exceção.
+            PhoneNumber numero = phoneNumberUtil.parse(telefone, codigoPais);
+            this.telefone = telefone;
+            return phoneNumberUtil.isValidNumber(numero);
+
+        } catch (NumberParseException e) {
+            return false;
+        }
     }
     public String getSenha() {
         return senha;
     }
-    public void setSenha(String senha) {
+    public boolean setSenha(String senha) {
+
+        if (senha == null) {
+            return false; // Não deve ser nulo
+        }
+
+        // Comprimento mínimo e máximo
+        if (senha.length() < 8 || senha.length() > 40) {
+            return false;
+        }
+
         this.senha = senha;
+        return true;
     }
     public String getUsuario() {
         return usuario;
     }
-    public void setUsuario(String usuario) {
+    public boolean setUsuario(String usuario) {
+
+        if (usuario == null) {
+            return false; // Não deve ser nulo
+        }
+        
+        // Comprimento mínimo e máximo
+        if (usuario.length() < 3 || usuario.length() > 50) {
+            return false;
+        }
+        
+        // Caracteres válidos (permite letras, espaços, hífens e apóstrofos)
+        if (!usuario.matches("^[\\p{L}0-9\\s'-]+$")) {
+            return false;
+        }
+
         this.usuario = usuario;
+        return true;
     }
     public ArrayList<Endereco> getEnderecos() {
         return enderecos;
     }
-    public void setEnderecos(ArrayList<Endereco> endereco) {
+    public boolean setEnderecos(ArrayList<Endereco> endereco) {
         this.enderecos = endereco;
+        return true;
     }
     public LocalDate getDataNasc() {
         return dataNasc;
     }
-    public void setDataNasc(LocalDate dataNasc) {
+    public boolean setDataNasc(LocalDate dataNasc) {
+
+        if (dataNasc == null) {
+            return false; // Não deve ser nulo
+        }
+
+        //A data não pode estar no futuro
+        LocalDate dataAtual = LocalDate.now();
+        if (dataNasc.isAfter(dataAtual)) {
+            return false;
+        }
+
+        //A data não pode estar muito no passado
+        LocalDate dataMinima = dataAtual.minusYears(110);
+        if (dataNasc.isBefore(dataMinima)) {
+            return false;
+        }
+
+        //A data não pode estar depois de 18 anos antes, ou seja o usuário não pode ter menos de 18 anos.
+        LocalDate idadeMinima = dataAtual.minusYears(18);
+        if (dataNasc.isAfter(idadeMinima)) {
+            return false;
+        }
+
         this.dataNasc = dataNasc;
+        return true;
     }
 
     @Override
