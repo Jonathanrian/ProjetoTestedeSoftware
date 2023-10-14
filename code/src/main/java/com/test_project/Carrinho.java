@@ -303,39 +303,4 @@ public class Carrinho {
         return "Carrinho [cliente=" + cliente + ", produtos=" + produtos + "]";
     }
 
-    public static void main(String[] args) {
-
-        Usuario cliente = Usuario.login("RenanCosta", "renan123");
-
-        Carrinho carrinho = new Carrinho(cliente);
-
-        Produto produto = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
-        Produto produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
-
-        carrinho.adicionarItem(produto);
-
-        System.out.println(carrinho.quantidadeProduto(produto));
-
-        carrinho.esvaziarCarrinho();
-
-        carrinho.atualizarBanco();
-
-        System.out.println(carrinho);
-        // carrinho.removerItem(produto2, -1);
-        
-        // System.out.println(carrinho.getProdutos());
-
-        // System.out.println(carrinho.calcularTotal());
-
-        // System.out.println(carrinho.quantidadeProduto(produto2));
-
-        // System.out.println(carrinho.produtosCarrinho());
-
-        // carrinho.esvaziarCarrinho();
-
-        // System.out.println(carrinho.getProdutos());
-        
-    }
-
 }
-
