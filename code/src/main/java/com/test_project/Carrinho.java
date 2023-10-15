@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Carrinho {
     private Usuario cliente;
@@ -64,21 +65,11 @@ public class Carrinho {
 
     public boolean adicionarItem(Produto produto){
         try {
-
-            if (this.produtos.isEmpty()) {
+            if (this.produtos.containsKey(produto)) {
+            this.produtos.put(produto, this.produtos.get(produto) + 1);
+            } else{
                 this.produtos.put(produto, 1);
-                return true;
             }
-
-            for (Produto key : this.produtos.keySet()) {
-                if (key.getId() == produto.getId()) {
-                    this.produtos.put(key, this.produtos.get(key) + 1);
-                    return true;
-                }
-            }
-
-            this.produtos.put(produto, 1);
-            
             return true;
         } catch (Exception e) {
             return false;
@@ -89,17 +80,12 @@ public class Carrinho {
     public boolean removerItem(Produto produto){
 
         try {
-
-            for (Produto key : this.produtos.keySet()) {
-
-                if (key.getId() == produto.getId()) {
-                    this.produtos.remove(key);
-                    return true;
-                }
-                
+            if (this.produtos.containsKey(produto)) {
+                this.produtos.remove(produto);
+                return true;
+            } else{
+                return false;
             }
-
-            return false;
         } catch (Exception e) {
             return false;
         }
@@ -108,21 +94,16 @@ public class Carrinho {
 
     public boolean removerItem(Produto produto, int decremento){
 
-    try {
-
-            for (Produto key : this.produtos.keySet()) {
-
-                if (key.getId() == produto.getId()) {
-                    this.produtos.put(key, this.produtos.get(key) + decremento);
-                    if (this.produtos.get(key) <= 0) {
-                        this.produtos.remove(key);
-                    }
-                    return true;
+        try {
+            if (this.produtos.containsKey(produto)) {
+                this.produtos.put(produto, this.produtos.get(produto) + decremento);
+                if (this.produtos.get(produto) == 0) {
+                    this.produtos.remove(produto);
                 }
-                
+                return true;
+            } else{
+                return false;
             }
-
-            return false;
         } catch (Exception e) {
             return false;
         }
@@ -145,15 +126,11 @@ public class Carrinho {
 
     public int quantidadeProduto(Produto produto){
         try {
-
-            for (Produto key : this.produtos.keySet()) {
-                if (key.getId() == produto.getId()) {
-                    return this.produtos.get(key);
-                }
+            if (this.produtos.containsKey(produto)) {
+                return this.produtos.get(produto);
+            } else{
+                return -1;
             }
-
-            return -1;
-
         } catch (Exception e) {
             return -1;
         }
@@ -198,7 +175,8 @@ public class Carrinho {
                 
             return pedido;
         } catch (Exception e) {
-            return null;
+            System.err.println("Erro durante o cadastro: " + e.getMessage());
+            throw e;
         }
     }
 
@@ -302,5 +280,26 @@ public class Carrinho {
     public String toString() {
         return "Carrinho [cliente=" + cliente + ", produtos=" + produtos + "]";
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Carrinho other = (Carrinho) obj;
+        
+        return Objects.equals(cliente, other.cliente) &&
+            Objects.equals(produtos, other.produtos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cliente, produtos);
+    }
+
 
 }
