@@ -22,12 +22,15 @@ public class UsuarioTest {
 
     /**
      * Verifica se o método cadastra o usuário corretamente no banco de dados.
+     * @throws Exception
      */
     @Test
-    void cadastrar(){
+    void cadastrar() throws Exception{
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
+            
+            this.cliente.cadastrar();
 
             PreparedStatement pstmt = connection.prepareStatement(
                 "SELECT * FROM " + 
@@ -37,20 +40,19 @@ public class UsuarioTest {
 
             ResultSet rs = pstmt.executeQuery();
 
-            this.cliente.cadastrar();
-
             Usuario usuario = null;
 
             while (rs.next()) {
-                usuario = new Usuario(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getDate(7).toLocalDate());
+                usuario = new Usuario(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
             }
 
             assertEquals(this.cliente, usuario);
-
-            this.cliente.excluirUsuario();
+            
+            cliente.excluirUsuario();
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println("Erro durante o cadastro: " + e.getMessage());
+            throw e;
         }
 
     }
