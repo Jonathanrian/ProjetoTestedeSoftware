@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -51,7 +52,58 @@ public class UsuarioTest {
             cliente.excluirUsuario();
 
         } catch (Exception e) {
-            System.err.println("Erro durante o cadastro: " + e.getMessage());
+            throw e;
+        }
+
+    }
+    
+    /**
+     * Verifica se o método efetua o login do usuário corretamente.
+     */
+    @Test
+    void login(){
+
+        this.cliente.cadastrar();
+
+        Usuario cliente2 = Usuario.login("RenanCosta", "renan123");
+
+        this.cliente.setId(cliente2.getId());
+
+        assertEquals(this.cliente, cliente2);
+
+        Usuario cliente3 = Usuario.login("zezinho123", "coxinha123");
+
+        assertNull(cliente3);
+
+        this.cliente.excluirUsuario();
+
+    }
+
+    /**
+     * Verifica se o método efetua o login do usuário corretamente.
+     * @throws Exception
+     */ 
+    @Test
+    void excluirUsuario() throws Exception{
+
+        this.cliente.cadastrar();
+
+        this.cliente.excluirUsuario();
+
+        try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " + 
+                "cliente WHERE cpf = ?");
+
+            pstmt.setString(1, this.cliente.getCpf());
+
+            ResultSet rs = pstmt.executeQuery();
+
+            assertFalse(rs.next());
+
+        } catch (Exception e) {
             throw e;
         }
 
