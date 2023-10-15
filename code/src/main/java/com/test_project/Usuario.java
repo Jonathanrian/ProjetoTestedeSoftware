@@ -3,6 +3,8 @@ package com.test_project;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Objects;
+
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -27,6 +29,7 @@ public class Usuario {
             String usuario, LocalDate dataNasc) {
         this.nome_completo = nome_completo;
         this.cpf = cpf;
+        setCpf(this.cpf);
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
@@ -39,6 +42,7 @@ public class Usuario {
         this.id = id;
         this.nome_completo = nome_completo;
         this.cpf = cpf;
+        setCpf(this.cpf);
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
@@ -155,8 +159,20 @@ public class Usuario {
 
     public boolean validarDados(){
         try {
-            
-            return true;
+
+            if (setNome_completo(this.nome_completo) &&
+                setCpf(this.cpf) &&
+                setEmail(this.email) &&
+                setTelefone(this.telefone, "BR") &&
+                setSenha(this.senha) &&
+                setUsuario(this.usuario) &&
+                setDataNasc(dataNasc)){
+                
+                return true;
+            } else{
+                return false;
+            }
+
         } catch (Exception e) {
             return false;
         }
@@ -247,6 +263,8 @@ public class Usuario {
             if (cpf == null) {
                 return false; // Não deve ser nulo
             }
+
+            cpf = cpf.replaceAll("[^0-9]", "");
 
             // O cpfValidator faz a validação do CPF, caso seja inválido irá gerar uma exceção.
             cpfValidator.assertValid(cpf); 
@@ -379,6 +397,31 @@ public class Usuario {
         return "Usuario [id=" + id + ", nome_completo=" + nome_completo + ", cpf=" + cpf + ", email=" + email
                 + ", telefone=" + telefone + ", senha=" + senha + ", usuario=" + usuario + ", enderecos=" + enderecos
                 + ", dataNasc=" + dataNasc + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Usuario other = (Usuario) obj;
+        
+        return id == other.id &&
+            Objects.equals(nome_completo, other.nome_completo) &&
+            Objects.equals(cpf, other.cpf) &&
+            Objects.equals(email, other.email) &&
+            Objects.equals(senha, other.senha) &&
+            Objects.equals(usuario, other.usuario) &&
+            Objects.equals(dataNasc, other.dataNasc);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome_completo, cpf, email, senha, usuario, dataNasc);
     }
 
 }
