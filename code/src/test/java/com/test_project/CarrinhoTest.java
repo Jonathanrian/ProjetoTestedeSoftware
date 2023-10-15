@@ -75,7 +75,7 @@ class CarrinhoTest {
         assertTrue(carrinho.removerItem(produto1, -2));
         assertEquals(1, carrinho.quantidadeProduto(produto1));
         assertTrue(carrinho.removerItem(produto1, -3));
-        assertEquals(-1, carrinho.quantidadeProduto(produto1));
+        assertEquals(-2, carrinho.quantidadeProduto(produto1));
     }
 
     /**
