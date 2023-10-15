@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Carrinho",
+            "request": "launch",
+            "mainClass": "com.test_project.Carrinho",
+            "projectName": "code"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
