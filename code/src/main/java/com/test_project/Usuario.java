@@ -60,10 +60,11 @@ public class Usuario {
 
                 PreparedStatement pstmt = connection.prepareStatement(
                     "SELECT * FROM " + 
-                    "cliente WHERE cpf = ? OR usuario = ?");
+                    "cliente WHERE cpf = ? OR usuario = ? OR email = ?");
 
                 pstmt.setString(1, getCpf());
                 pstmt.setString(2, getUsuario());
+                pstmt.setString(3, getEmail());
                 ResultSet rs = pstmt.executeQuery();
 
                 if (!rs.next()) {
@@ -242,7 +243,7 @@ public class Usuario {
             return false;
         }
         
-        // Caracteres válidos (permite letras, espaços, hífens e apóstrofos)
+        // Caracteres válidos (permite letras, espaços, hífens, apóstrofos e acentos)
         if (!nome_completo.matches("^[\\p{L}\\s'-]+$")) {
             return false;
         }
@@ -252,6 +253,7 @@ public class Usuario {
             return false;
         }
         
+        this.nome_completo = nome_completo;
         return true;
     }
     public String getCpf() {
@@ -346,7 +348,7 @@ public class Usuario {
             return false;
         }
         
-        // Caracteres válidos (permite letras, espaços, hífens e apóstrofos)
+        // Caracteres válidos (permite letras, espaços, hífens, apóstrofos, acentos e números.)
         if (!usuario.matches("^[\\p{L}0-9\\s'-]+$")) {
             return false;
         }
