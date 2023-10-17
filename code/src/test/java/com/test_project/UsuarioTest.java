@@ -107,6 +107,59 @@ public class UsuarioTest {
     }
 
     /**
+     * Verifica se o método cadastra o usuário corretamente no banco de dados.
+     * @throws Exception
+     */
+    @Test
+    void adicionarEnderecoTest() throws Exception{
+
+        try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+            
+            this.cliente.cadastrar();
+
+            this.cliente = Usuario.login("RenanCosta", "renan123");
+
+            Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+            this.cliente.adicionarEndereco(endereco);
+
+            assertTrue(this.cliente.getEnderecos().contains(endereco));
+
+            this.cliente = Usuario.login("RenanCosta", "renan123");
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " + 
+                "endereco WHERE id_endereco = ?");
+
+            pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
+
+            ResultSet rs = pstmt.executeQuery();
+
+            Endereco endereco2 = null;
+
+            if (rs.next()) {
+                endereco2 = new Endereco(rs.getInt(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(8), rs.getString(9), rs.getInt(7));
+            }
+
+            assertEquals(this.cliente.getEnderecos().get(0), endereco2);
+
+            pstmt = connection.prepareStatement(
+                "DELETE FROM " + 
+                "endereco WHERE id_endereco = ?");
+
+                pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
+                pstmt.executeUpdate();
+            
+            cliente.excluirUsuario();
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    /**
      * Verifica se o método efetua o login do usuário corretamente.
      * @throws Exception
      */ 
