@@ -3,6 +3,7 @@ package com.test_project;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -29,7 +30,6 @@ public class Usuario {
             String usuario, LocalDate dataNasc) {
         this.nome_completo = nome_completo;
         this.cpf = cpf;
-        setCpf(this.cpf);
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
@@ -37,7 +37,7 @@ public class Usuario {
         this.dataNasc = dataNasc;
     }
 
-    public Usuario(int id, String nome_completo, String cpf, String email, String telefone, String senha,
+    public  Usuario(int id, String nome_completo, String cpf, String email, String telefone, String senha,
             String usuario, ArrayList<Endereco> endereco, LocalDate dataNasc) {
         this.id = id;
         this.nome_completo = nome_completo;
@@ -165,14 +165,13 @@ public class Usuario {
                 return false;
             }
 
-            this.enderecos.add(endereco);
-
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
             PreparedStatement pstmt = connection.prepareStatement(
                 "INSERT INTO " + 
                 "endereco(cliente, estado, cidade, bairro, rua, numero, complemento, cep)" + 
-                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS);
 
             pstmt.setInt(1, this.id);
             pstmt.setString(2, endereco.getEstado());
@@ -184,6 +183,13 @@ public class Usuario {
             pstmt.setString(8, endereco.getCep());
             pstmt.executeUpdate();
 
+            ResultSet keyEndereco = pstmt.getGeneratedKeys();
+            if (keyEndereco.next()) {
+                int idEndereco = keyEndereco.getInt(1);
+                endereco.setId(idEndereco);
+            }
+
+            this.enderecos.add(endereco);
             return true;
             
         } catch (Exception e) {
@@ -250,6 +256,33 @@ public class Usuario {
         try {
             ArrayList<Pedido> pedidos = new ArrayList<>();
 
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " + 
+                "pedido WHERE cliente = ?");
+
+            pstmt.setInt(1, getId());
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Pedido pedido;
+                int numPedido = rs.getInt(1);
+                HashMap<Produto, Integer> produtos;
+                String status = rs.getString(3);
+                java.sql.Date dataSqlC = rs.getDate(4);
+                LocalDate dataCriacao = dataSqlC.toLocalDate();
+                double valorTotal = rs.getDouble(5);
+                String formaPagamento = rs.getString(5);
+                java.sql.Date dataSqlE = rs.getDate(6);
+                LocalDate dataEnvio = dataSqlE.toLocalDate();
+                double valorProdutos = 0;
+                Endereco endereco;
+                String tipoEnvio;
+                double custoEnvio;
+                double valorFrete;
+            }
+
             return pedidos;
         } catch (Exception e) {
             return null;
@@ -268,21 +301,25 @@ public class Usuario {
     }
     public boolean setNome_completo(String nome_completo) {
         if (nome_completo == null) {
+            System.out.println("O nome não pode estar vazio!");
             return false; // Não deve ser nulo
         }
         
         // Comprimento mínimo e máximo
         if (nome_completo.length() < 4 || nome_completo.length() > 100) {
+            System.out.println("Quantidade de caracteres inválidas!");
             return false;
         }
         
         // Caracteres válidos (permite letras, espaços, hífens, apóstrofos e acentos)
         if (!nome_completo.matches("^[\\p{L}\\s'-]+$")) {
+            System.out.println("Não é permitido símbolos no nome!");
             return false;
         }
         
         // Evita números
         if (nome_completo.matches(".*\\d.*")) {
+            System.out.println("O nome não deve haver números!");
             return false;
         }
         
@@ -296,6 +333,7 @@ public class Usuario {
         CPFValidator cpfValidator = new CPFValidator(); 
         try {
             if (cpf == null) {
+                System.out.println("O CPF não pode ser nulo!");
                 return false; // Não deve ser nulo
             }
 
@@ -308,6 +346,7 @@ public class Usuario {
             return true;
 
         } catch (Exception e) {
+            System.out.println("CPF inválido!");
             return false;
         }
     }
@@ -317,6 +356,7 @@ public class Usuario {
     public boolean setEmail(String email) {
         try {
             if (email == null) {
+                System.out.println("O email não pode ser nulo!");
                 return false; // Não deve ser nulo
             }
 
@@ -327,6 +367,7 @@ public class Usuario {
             return true;
 
         } catch (AddressException e) {
+            System.out.println("Email inválido!");
             return false;
         }
     }
@@ -337,8 +378,8 @@ public class Usuario {
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
         try {
             // O telefone pode ser nulo então ele armazena na variável e retorna verdadeiro
-            if (telefone == null) {
-                this.telefone = telefone;
+            if (telefone == null || telefone == "") {
+                this.telefone = null;
                 return true;
             }
             // O InternetAddress faz a validação do telefone, caso seja inválido irá gerar uma exceção.
@@ -347,6 +388,7 @@ public class Usuario {
             return phoneNumberUtil.isValidNumber(numero);
 
         } catch (NumberParseException e) {
+            System.out.println("Telefone inválido!");
             return false;
         }
     }
@@ -356,11 +398,13 @@ public class Usuario {
     public boolean setSenha(String senha) {
 
         if (senha == null) {
+            System.out.println("A senha não pode ser nula!");
             return false; // Não deve ser nulo
         }
 
         // Comprimento mínimo e máximo
         if (senha.length() < 8 || senha.length() > 40) {
+            System.out.println("Quantidade de caracteres inválido!");
             return false;
         }
 
@@ -373,16 +417,19 @@ public class Usuario {
     public boolean setUsuario(String usuario) {
 
         if (usuario == null) {
+            System.out.println("O usuário não pode estar vazio!");
             return false; // Não deve ser nulo
         }
         
         // Comprimento mínimo e máximo
         if (usuario.length() < 3 || usuario.length() > 50) {
+            System.out.println("Quantidade de caracteres inválidas!");
             return false;
         }
         
         // Caracteres válidos (permite letras, espaços, hífens, apóstrofos, acentos e números.)
         if (!usuario.matches("^[\\p{L}0-9\\s'-]+$")) {
+            System.out.println("Não é permitido símbolos no usuário!");
             return false;
         }
 
@@ -402,24 +449,28 @@ public class Usuario {
     public boolean setDataNasc(LocalDate dataNasc) {
 
         if (dataNasc == null) {
+            System.out.println("A data de nascimento não pode ser nula!");
             return false; // Não deve ser nulo
         }
 
         //A data não pode estar no futuro
         LocalDate dataAtual = LocalDate.now();
         if (dataNasc.isAfter(dataAtual)) {
+            System.out.println("A data de nascimento não pode estar no futuro!");
             return false;
         }
 
         //A data não pode estar muito no passado
         LocalDate dataMinima = dataAtual.minusYears(110);
         if (dataNasc.isBefore(dataMinima)) {
+            System.out.println("A data não pode estar muito tempo no passado!");
             return false;
         }
 
         //A data não pode estar depois de 18 anos antes, ou seja o usuário não pode ter menos de 18 anos.
         LocalDate idadeMinima = dataAtual.minusYears(18);
         if (dataNasc.isAfter(idadeMinima)) {
+            System.out.println("O usuário não pode ter menos de 18 anos!");
             return false;
         }
 
