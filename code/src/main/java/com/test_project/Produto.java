@@ -15,12 +15,12 @@ public class Produto {
             String fabricante, int desconto) {
         this.id = id;
         this.nome = nome;
-        this.preco = preco;
         this.categoria = categoria;
         this.estoque = estoque;
         this.descricao = descricao;
         this.fabricante = fabricante;
         this.desconto = desconto;
+        setPreco(preco);
     }
 
     public boolean exibirDetalhes(){
@@ -55,6 +55,10 @@ public class Produto {
     }
     public int getDesconto() {
         return desconto;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco * (100 - desconto)/100;
     }
 
     @Override
