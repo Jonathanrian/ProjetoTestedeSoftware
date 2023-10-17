@@ -13,20 +13,6 @@
         },
         {
             "type": "java",
-            "name": "TokenRecuperacao",
-            "request": "launch",
-            "mainClass": "com.test_project.TokenRecuperacao",
-            "projectName": "code"
-        },
-        {
-            "type": "java",
-            "name": "RecuperarSenha",
-            "request": "launch",
-            "mainClass": "com.test_project.RecuperarSenha",
-            "projectName": "code"
-        },
-        {
-            "type": "java",
             "name": "Carrinho",
             "request": "launch",
             "mainClass": "com.test_project.Carrinho",
@@ -37,13 +23,6 @@
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "App",
-            "request": "launch",
-            "mainClass": "com.test_project.App",
-            "projectName": "code"
         },
         {
             "type": "java",
