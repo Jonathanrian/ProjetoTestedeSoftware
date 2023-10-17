@@ -126,8 +126,6 @@ public class UsuarioTest {
 
             assertTrue(this.cliente.getEnderecos().contains(endereco));
 
-            this.cliente = Usuario.login("RenanCosta", "renan123");
-
             PreparedStatement pstmt = connection.prepareStatement(
                 "SELECT * FROM " + 
                 "endereco WHERE id_endereco = ?");
@@ -266,11 +264,19 @@ public class UsuarioTest {
         // Caso de sucesso: telefone válido de outro país, dos Estados Unidos nesse exemplo.
         String telefone5 = "+1 650-253-0000";
 
+        // Caso de sucesso: telefone válido pois o telefone é opcional
+        String telefone6 = "";
+
+        // Caso de sucesso: telefone válido pois o telefone é opcional
+        String telefone7 = null;
+
         assertTrue(cliente.setTelefone(telefone1, "BR"));
         assertFalse(cliente.setTelefone(telefone2, "BR"));
         assertTrue(cliente.setTelefone(telefone3, "BR"));
         assertFalse(cliente.setTelefone(telefone4, "BR"));
         assertTrue(cliente.setTelefone(telefone5, "US"));
+        assertTrue(cliente.setTelefone(telefone6, "BR"));
+        assertTrue(cliente.setTelefone(telefone7, "BR"));
     }
 
     /**
