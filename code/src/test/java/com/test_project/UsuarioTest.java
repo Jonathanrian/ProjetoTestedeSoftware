@@ -26,7 +26,7 @@ public class UsuarioTest {
      * @throws Exception
      */
     @Test
-    void cadastrar() throws Exception{
+    void cadastrarTest() throws Exception{
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
@@ -47,7 +47,34 @@ public class UsuarioTest {
                 usuario = new Usuario(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
             }
 
+            //Teste para verificar se o cliente foi cadastrado com sucesso.
             assertEquals(this.cliente, usuario);
+
+            LocalDate data = LocalDate.of(2003, 7, 27);
+
+            Usuario clienteCPF = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "email@gmail.com", null, "renan123", "usuario", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um CPF que já está cadastrado.
+            */
+            assertFalse(clienteCPF.cadastrar());
+
+            Usuario clienteEmail = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "418.256.950-40", "renanleitedacosta@gmail.com", null, "renan123", "usuario", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um email que já está cadastrado.
+            */
+            assertFalse(clienteEmail.cadastrar());
+
+            Usuario clienteUsuario = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "418.256.950-40", "email@gmail.com", null, "renan123", "RenanCosta", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um usuário que já está cadastrado.
+            */
+            assertFalse(clienteUsuario.cadastrar());
             
             cliente.excluirUsuario();
 
@@ -61,7 +88,7 @@ public class UsuarioTest {
      * Verifica se o método efetua o login do usuário corretamente.
      */
     @Test
-    void login(){
+    void loginTest(){
 
         this.cliente.cadastrar();
 
@@ -84,7 +111,7 @@ public class UsuarioTest {
      * @throws Exception
      */ 
     @Test
-    void excluirUsuario() throws Exception{
+    void excluirUsuarioTest() throws Exception{
 
         this.cliente.cadastrar();
 
