@@ -22,7 +22,7 @@ public class Usuario {
     private String telefone;
     private String senha;
     private String usuario;
-    private ArrayList<Endereco> enderecos;
+    private ArrayList<Endereco> enderecos = new ArrayList<>();
     private LocalDate dataNasc;
     
     public Usuario(String nome_completo, String cpf, String email, String telefone, String senha,
@@ -155,6 +155,39 @@ public class Usuario {
         } catch (Exception e) {
             System.out.println(e);
             return null;
+        }
+    }
+
+    public boolean adicionarEndereco(Endereco endereco) throws Exception{
+        try {
+
+            if (endereco == null) {
+                return false;
+            }
+
+            this.enderecos.add(endereco);
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "INSERT INTO " + 
+                "endereco(cliente, estado, cidade, bairro, rua, numero, complemento, cep)" + 
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+
+            pstmt.setInt(1, this.id);
+            pstmt.setString(2, endereco.getEstado());
+            pstmt.setString(3, endereco.getCidade());
+            pstmt.setString(4, endereco.getBairro());
+            pstmt.setString(5, endereco.getRua());
+            pstmt.setInt(6, endereco.getNumero());
+            pstmt.setString(7, endereco.getComplemento());
+            pstmt.setString(8, endereco.getCep());
+            pstmt.executeUpdate();
+
+            return true;
+            
+        } catch (Exception e) {
+            throw e;
         }
     }
 
