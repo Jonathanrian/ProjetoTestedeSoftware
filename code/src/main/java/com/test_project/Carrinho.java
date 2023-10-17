@@ -1,7 +1,6 @@
 package com.test_project;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -170,7 +169,7 @@ public class Carrinho {
             Pedido pedido = null;
 
             if (!this.produtos.isEmpty() && cliente != null) {
-                pedido = new Pedido(produtos, cliente, this.calcularTotal(), LocalDate.now());
+                pedido = new Pedido(produtos, cliente, this.calcularTotal());
             }
                 
             return pedido;
