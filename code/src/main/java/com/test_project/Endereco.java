@@ -1,5 +1,6 @@
 package com.test_project;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +26,17 @@ public class Endereco {
         setNumero(numero);
     }
     
+    public Endereco(String estado, String cidade, String bairro, String rua, String complemento, String cep,
+            int numero) {
+        setEstado(estado);
+        setCidade(cidade);
+        setBairro(bairro);
+        setRua(rua);
+        setComplemento(complemento);
+        setCep(cep);
+        setNumero(numero);
+    }
+
     public int getId() {
         return id;
     }
@@ -197,5 +209,29 @@ public class Endereco {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Endereco other = (Endereco) obj;
+        return id == other.id &&
+            numero == other.numero &&
+            Objects.equals(estado, other.estado) &&
+            Objects.equals(cidade, other.cidade) &&
+            Objects.equals(bairro, other.bairro) &&
+            Objects.equals(rua, other.rua) &&
+            Objects.equals(complemento, other.complemento) &&
+            Objects.equals(cep, other.cep);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, estado, cidade, bairro, rua, complemento, cep, numero);
     }
 }
