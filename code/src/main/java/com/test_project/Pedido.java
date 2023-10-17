@@ -3,6 +3,7 @@ package com.test_project;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Pedido {
     private int numPedido;
@@ -34,22 +35,83 @@ public class Pedido {
         }
     }
 
-    public boolean finalizarCompra(){
+    public boolean finalizarCompra() throws Exception{
         try {
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "INSERT INTO " + 
+                "pedido (cliente, status, data_criacao, valor_total, forma_pagamento, data_envio, tipo_envio, valor_frete, endereco) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
+                Statement.RETURN_GENERATED_KEYS);
+
+            pstmt.setInt(1, this.cliente.getId());
+            setStatus("em andamento");
+            pstmt.setString(2, status);
+            this.dataCriacao = LocalDate.now();
+            pstmt.setDate(3, Date.valueOf(dataCriacao));
+            setValorProdutos();
+            setCustoEnvio();
+            setValorTotal();
+            pstmt.setDouble(4, this.valorTotal);
+            pstmt.setString(5, this.formaPagamento);
+            this.dataEnvio = LocalDate.now().plusDays(3);
+            pstmt.setDate(6, Date.valueOf(dataEnvio));
+            if (tipoEnvio == "envio padrão") {
+                pstmt.setInt(7, 1);
+            } else if(tipoEnvio == "envio expresso"){
+                pstmt.setInt(7, 2);
+            }
+            pstmt.setDouble(8, this.valorFrete);
+            pstmt.setInt(9, this.endereco.getId());
+            pstmt.executeUpdate();
+
+            int idPedido = 0;
+
+            ResultSet keyPedido = pstmt.getGeneratedKeys();
+            if (keyPedido.next()) {
+                
+                idPedido = keyPedido.getInt(1);
+                setNumPedido(idPedido);
+            } else{
+                return false;
+            }
+
+            for (Entry<Produto, Integer> map : produtos.entrySet()) {
+                Produto produto = map.getKey();
+                Integer quantidade = map.getValue();
+
+                pstmt = connection.prepareStatement(
+                    "INSERT INTO "+
+                    "produtos_pedido(id_pedido, id_produto, quantidade) " +
+                    "VALUES (?, ?, ?)"
+                );
+    
+                pstmt.setInt(1, idPedido);
+                pstmt.setInt(2, produto.getId());
+                pstmt.setInt(3, quantidade);
+                pstmt.executeUpdate();
+            }
+
             return true;
         } catch (Exception e) {
-            return false;
+            throw e;
         }
     }
 
     public boolean cancelarPedido(){
         try {
 
+            if (this.status.equals("cancelado") || this.status.equals("concluído")) {
+                return false;
+            }
+
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
             PreparedStatement pstmt = connection.prepareStatement(
                 "UPDATE pedido " + 
-                "SET status = 'Cancelado' " +
+                "SET status = 'cancelado' " +
                 "WHERE id_pedido = ?");
 
             pstmt.setInt(1, getNumPedido());
