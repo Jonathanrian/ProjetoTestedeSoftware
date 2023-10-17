@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -31,6 +34,7 @@ public class PedidoTest {
         this.produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
         carrinho.esvaziarCarrinho();
         this.carrinho.adicionarItem(produto1);
+        this.carrinho.adicionarItem(produto1);
         this.carrinho.adicionarItem(produto2);
         
 
@@ -38,18 +42,101 @@ public class PedidoTest {
     }
 
     /**
-     * 
+     * Verifica se o pedido está sendo finalizado corretamente.
+     * @throws Exception
      */
     @Test
-    void finalizarCompraTest(){
+    void finalizarCompraTest() throws Exception{
+        this.pedido.setTipoEnvio("envio padrão");
+        this.pedido.setFormaPagamento("pix");
+
+        Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+        this.cliente.adicionarEndereco(endereco);
         
+        this.pedido.setEndereco(cliente.getEnderecos().get(0));
+
+        assertTrue(this.pedido.finalizarCompra());
+
+        try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "DELETE FROM " +
+                "produtos_pedido WHERE id_pedido = ?"
+            );
+
+            pstmt.setInt(1, this.pedido.getNumPedido());
+            pstmt.executeUpdate();
+
+            pstmt = connection.prepareStatement(
+                "DELETE FROM " +
+                "pedido WHERE id_pedido = ?"
+            );
+
+            pstmt.setInt(1, this.pedido.getNumPedido());
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            
+        }
+
     }
 
     /**
-     * 
+     * Verifica se um pedido que já 
+     * @throws Exception
      */
     @Test
-    void cancelarPedidoTest(){
+    void cancelarPedidoTest() throws Exception{
+
+        this.pedido.setTipoEnvio("envio padrão");
+        this.pedido.setFormaPagamento("pix");
+
+        Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+        this.cliente.adicionarEndereco(endereco);
+        
+        this.pedido.setEndereco(cliente.getEnderecos().get(0));
+
+        assertTrue(this.pedido.finalizarCompra());
+
+        this.pedido.cancelarPedido();
+
+        try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT status FROM " +
+                "pedido WHERE id_pedido = ?"
+            );
+
+            pstmt.setInt(1, this.pedido.getNumPedido());
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                assertEquals("cancelado", rs.getString(1));
+            }
+
+            pstmt = connection.prepareStatement(
+                "DELETE FROM " +
+                "produtos_pedido WHERE id_pedido = ?"
+            );
+
+            pstmt.setInt(1, this.pedido.getNumPedido());
+            pstmt.executeUpdate();
+
+            pstmt = connection.prepareStatement(
+                "DELETE FROM " +
+                "pedido WHERE id_pedido = ?"
+            );
+
+            pstmt.setInt(1, this.pedido.getNumPedido());
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            
+        }
         
     }
 
