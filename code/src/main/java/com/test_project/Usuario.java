@@ -266,21 +266,6 @@ public class Usuario {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Pedido pedido;
-                int numPedido = rs.getInt(1);
-                HashMap<Produto, Integer> produtos;
-                String status = rs.getString(3);
-                java.sql.Date dataSqlC = rs.getDate(4);
-                LocalDate dataCriacao = dataSqlC.toLocalDate();
-                double valorTotal = rs.getDouble(5);
-                String formaPagamento = rs.getString(5);
-                java.sql.Date dataSqlE = rs.getDate(6);
-                LocalDate dataEnvio = dataSqlE.toLocalDate();
-                double valorProdutos = 0;
-                Endereco endereco;
-                String tipoEnvio;
-                double custoEnvio;
-                double valorFrete;
             }
 
             return pedidos;
