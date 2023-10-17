@@ -8,7 +8,7 @@ public class Pedido {
     private int numPedido;
     private HashMap<Produto, Integer> produtos;
     private String status;
-    private Usuario usuario;
+    private Usuario cliente;
     private double valorProdutos;
     private String formaPagamento;
     private Endereco endereco;
@@ -19,11 +19,10 @@ public class Pedido {
     private double valorFrete;
     private double valorTotal;
 
-    public Pedido(HashMap<Produto, Integer> produtos, Usuario usuario, double valorProdutos, LocalDate dataCriacao) {
+    public Pedido(HashMap<Produto, Integer> produtos, Usuario cliente, double valorProdutos) {
         this.produtos = produtos;
-        this.usuario = usuario;
+        this.cliente = cliente;
         this.valorProdutos = valorProdutos;
-        this.dataCriacao = dataCriacao;
     }
 
     public boolean exibirDetalhes(){
@@ -43,25 +42,15 @@ public class Pedido {
         }
     }
 
-    public boolean editarFormaPagamento(String novaFormaPagamento){
-        try {
-
-            setFormaPagamento(novaFormaPagamento);
-
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public boolean cancelarPedido(){
         try {
 
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
             PreparedStatement pstmt = connection.prepareStatement(
-                "DELETE FROM " + 
-                "pedido WHERE id_pedido = ?");
+                "UPDATE pedido " + 
+                "SET status = 'Cancelado' " +
+                "WHERE id_pedido = ?");
 
             pstmt.setInt(1, getNumPedido());
             pstmt.executeUpdate();
@@ -88,85 +77,193 @@ public class Pedido {
     public void setNumPedido(int numPedido) {
         this.numPedido = numPedido;
     }
+
     public HashMap<Produto, Integer> getProdutos() {
         return produtos;
     }
-    public void setProdutos(HashMap<Produto, Integer> produtos) {
-        this.produtos = produtos;
-    }
+
     public String getStatus() {
         return status;
     }
-    public void setStatus(String status) {
-        this.status = status;
+    public boolean setStatus(String status) {
+
+        if (status == null) {
+            return false; // Não deve ser nulo
+        }
+
+        status = status.toLowerCase();
+
+        String[] arrayStatus = {
+            "em andamento", "enviado", "atrasado", "cancelado", "concluído"
+        };
+
+        for (String statusString : arrayStatus) {
+            if (statusString.equals(status)) {
+                this.status = status;
+                return true;
+            }
+        }
+
+        return false;
     }
-    public Usuario getUsuario() {
-        return usuario;
+
+    public Usuario getCliente() {
+        return cliente;
     }
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+
     public double getValorTotal() {
         return valorTotal;
     }
-    public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
+    public boolean setValorTotal() {
+
+        try {
+            this.valorTotal = this.valorProdutos + this.custoEnvio;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
+
     public String getFormaPagamento() {
         return formaPagamento;
     }
-    public void setFormaPagamento(String formaPagamento) {
-        this.formaPagamento = formaPagamento;
+    public boolean setFormaPagamento(String formaPagamento) {
+
+        if (formaPagamento == null) {
+            return false; // Não deve ser nulo
+        }
+
+        formaPagamento = formaPagamento.toLowerCase();
+
+        String[] arrayFormasPagamento = {
+            "cartão de crédito", "cartão de débito", "boleto bancãrio", "pix"
+        };
+
+        for (String formaPagamentoString : arrayFormasPagamento) {
+            if (formaPagamentoString.equals(formaPagamento)) {
+                this.formaPagamento = formaPagamento;
+                return true;
+            }
+        }
+
+        return false;
     }
+
     public Endereco getEndereco() {
         return endereco;
     }
-    public void setEndereco(Endereco endereco) {
+    public boolean setEndereco(Endereco endereco) {
+
+        if (endereco == null) {
+            return false;
+        }
+
         this.endereco = endereco;
+        return true;
     }
+
     public LocalDate getDataCriacao() {
         return dataCriacao;
     }
-    public void setDataCriacao(LocalDate dataCriacao) {
-        this.dataCriacao = dataCriacao;
-    }
+
     public LocalDate getDataEnvio() {
         return dataEnvio;
     }
-    public void setDataEnvio(LocalDate dataEnvio) {
+    public boolean setDataEnvio(LocalDate dataEnvio) {
+        if (dataEnvio == null) {
+            this.dataEnvio = LocalDate.now();
+            return true;
+        } else if (dataEnvio.isBefore(this.dataCriacao)) {
+            return false;
+        }
+
         this.dataEnvio = dataEnvio;
+        return true;
     }
+
     public String getTipoEnvio() {
         return tipoEnvio;
     }
-    public void setTipoEnvio(String tipoEnvio) {
-        this.tipoEnvio = tipoEnvio;
+    public boolean setTipoEnvio(String tipoEnvio) {
+
+        if (tipoEnvio == null) {
+            return false; // Não deve ser nulo
+        }
+
+        tipoEnvio = tipoEnvio.toLowerCase();
+
+        String[] arrayTipoEnvio = {
+            "envio padrão", "envio expresso"
+        };
+
+        for (String tipoEnvioString : arrayTipoEnvio) {
+            if (tipoEnvioString.equals(tipoEnvio)) {
+                this.tipoEnvio = tipoEnvio;
+                return true;
+            }
+        }
+
+        return false;
     }
+
     public double getCustoEnvio() {
         return custoEnvio;
     }
-    public void setCustoEnvio(double custoEnvio) {
-        this.custoEnvio = custoEnvio;
+
+    public boolean setCustoEnvio() {
+        
+        double custoTipo;
+
+        if (this.tipoEnvio == null) {
+            return false;
+        }
+
+        if (this.tipoEnvio.equals("envio padrão")) {
+            custoTipo = 10;
+        } else if (this.tipoEnvio.equals("envio expresso")) {
+            custoTipo = 20;
+        } else{
+            return false;
+        }
+
+        setValorFrete();
+
+        this.custoEnvio = custoTipo + getValorFrete();
+        return true;
     }
+
     public double getValorFrete() {
         return valorFrete;
     }
-    public void setValorFrete(double valorFrete) {
+    public void setValorFrete() {
+
+        double valorFrete = calcularFrete(this.endereco.getCep());
+
         this.valorFrete = valorFrete;
     }
 
     public double getValorProdutos() {
         return valorProdutos;
     }
+    public boolean setValorProdutos() {
+        try {
+            float total = 0;
 
-    public void setValorProdutos(double valorProdutos) {
-        this.valorProdutos = valorProdutos;
+            for (Produto produto : this.produtos.keySet()) {
+                total += produto.getPreco() * this.produtos.get(produto);
+            }
+
+            this.valorProdutos = total;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public String toString() {
-        return "Pedido [numPedido=" + numPedido + ", produtos=" + produtos + ", status=" + status + ", usuario="
-                + usuario + ", valorTotal=" + valorTotal + ", formaPagamento=" + formaPagamento + ", endereco="
+        return "Pedido [numPedido=" + numPedido + ", produtos=" + produtos + ", status=" + status + ", cliente="
+                + cliente + ", valorTotal=" + valorTotal + ", formaPagamento=" + formaPagamento + ", endereco="
                 + endereco + ", dataCriacao=" + dataCriacao + ", dataEnvio=" + dataEnvio + ", tipoEnvio=" + tipoEnvio
                 + ", custoEnvio=" + custoEnvio + ", valorFrete=" + valorFrete + "]";
     }
