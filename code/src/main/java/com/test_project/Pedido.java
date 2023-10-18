@@ -2,7 +2,9 @@ package com.test_project;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class Pedido {
@@ -53,7 +55,7 @@ public class Pedido {
         }
     }
 
-    public boolean finalizarCompra() throws Exception{
+    public boolean finalizarCompra(Carrinho carrinho) throws Exception{
         try {
 
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
@@ -111,6 +113,9 @@ public class Pedido {
                 pstmt.setInt(3, quantidade);
                 pstmt.executeUpdate();
             }
+            
+            carrinho.esvaziarCarrinho();
+            carrinho.atualizarBanco();
 
             return true;
         } catch (Exception e) {
@@ -118,7 +123,7 @@ public class Pedido {
         }
     }
 
-    public boolean cancelarPedido(){
+    public boolean cancelarPedido() throws Exception{
         try {
 
             if (this.status.equals("cancelado") || this.status.equals("concluído")) {
@@ -137,7 +142,7 @@ public class Pedido {
 
             return true;
         } catch (Exception e) {
-            return false;
+            throw e;
         }
     }
 
@@ -216,7 +221,7 @@ public class Pedido {
         formaPagamento = formaPagamento.toLowerCase();
 
         String[] arrayFormasPagamento = {
-            "cartão de crédito", "cartão de débito", "boleto bancãrio", "pix"
+            "cartão de crédito", "cartão de débito", "boleto bancário", "pix"
         };
 
         for (String formaPagamentoString : arrayFormasPagamento) {
@@ -225,6 +230,8 @@ public class Pedido {
                 return true;
             }
         }
+
+        System.out.println("\nForma de pagamento inválida!");
 
         return false;
     }
@@ -244,6 +251,10 @@ public class Pedido {
 
     public LocalDate getDataCriacao() {
         return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDate dataCriacao) {
+        this.dataCriacao = dataCriacao;
     }
 
     public LocalDate getDataEnvio() {
@@ -283,6 +294,7 @@ public class Pedido {
             }
         }
 
+        System.out.println("\nTipo de envio inválido!");
         return false;
     }
 
@@ -340,12 +352,39 @@ public class Pedido {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Pedido [numPedido=" + numPedido + ", produtos=" + produtos + ", status=" + status + ", cliente="
-                + cliente + ", valorTotal=" + valorTotal + ", formaPagamento=" + formaPagamento + ", endereco="
-                + endereco + ", dataCriacao=" + dataCriacao + ", dataEnvio=" + dataEnvio + ", tipoEnvio=" + tipoEnvio
-                + ", custoEnvio=" + custoEnvio + ", valorFrete=" + valorFrete + "]";
+    public String toString(Usuario cliente) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("========== Detalhes do Pedido #").append(numPedido).append(" ==========\n");
+        sb.append("Status: ").append(status).append("\n");
+        String dataCriacaoFormatada = formatarData(dataCriacao);
+        sb.append("Data de Criação: ").append(dataCriacaoFormatada).append("\n");
+        sb.append("Cliente: ").append(cliente.getNome_completo()).append(" (ID: ").append(cliente.getId()).append(")\n");
+        sb.append("Forma de Pagamento: ").append(formaPagamento).append("\n");
+
+        sb.append("Produtos:\n");
+        for (Map.Entry<Produto, Integer> entry : produtos.entrySet()) {
+            Produto produto = entry.getKey();
+            int quantidade = entry.getValue();
+            sb.append("   - ").append(produto.getNome()).append(" (ID: ").append(produto.getId()).append(") x ").append(quantidade).append("\n");
+        }
+
+        sb.append("Endereço de Entrega:\n");
+        sb.append("   ").append(endereco.toString()).append("\n");
+
+        sb.append("Tipo de Envio: ").append(tipoEnvio).append("\n");
+        sb.append("Custo de Envio: R$").append(custoEnvio).append("\n");
+        sb.append("Valor do Frete: R$").append(valorFrete).append("\n");
+        sb.append("Valor Total do Pedido: R$").append(valorTotal).append("\n");
+
+        return sb.toString();
     }
+
+    public String formatarData(LocalDate data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+        return data.format(formatter);
+    }
+
+
 }
 
