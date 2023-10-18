@@ -1,5 +1,9 @@
 package com.test_project;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 public class Produto {
     private int id;
     private String nome;
@@ -9,7 +13,6 @@ public class Produto {
     private String descricao;
     private String fabricante;
     private int desconto;
-    //private Image imagem;
 
     public Produto(int id, String nome, double preco, String categoria, int estoque, String descricao,
             String fabricante, int desconto) {
@@ -29,6 +32,42 @@ public class Produto {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public static Produto buscaProduto(int id_produto) throws Exception{
+        try {
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " +
+                "produto WHERE id_produto = ?");
+
+            pstmt.setInt(1, id_produto);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            Produto produto = null;
+
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                String nome = rs.getString(2);
+                double preco = rs.getDouble(3);
+                String categoria = rs.getString(4);
+                int estoque = rs.getInt(5);
+                String descricao = rs.getString(6);
+                String fabricante = rs.getString(7);
+                int desconto = rs.getInt(8);
+
+                produto = new Produto(id, nome, preco, categoria, estoque, descricao, fabricante, desconto);
+
+            }
+
+            return produto;
+            
+        } catch (Exception e) {
+            throw e;
         }
     }
 
