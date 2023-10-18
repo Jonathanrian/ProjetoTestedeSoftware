@@ -252,25 +252,61 @@ public class Usuario {
         }
     }
 
-    public ArrayList<Pedido> listarPedidos(){
+    public ArrayList<Pedido> listarPedidos(Usuario cliente) throws Exception{
         try {
             ArrayList<Pedido> pedidos = new ArrayList<>();
 
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
             PreparedStatement pstmt = connection.prepareStatement(
-                "SELECT * FROM " + 
-                "pedido WHERE cliente = ?");
+                "SELECT * FROM " +
+                "pedido INNER JOIN envio " +
+                "ON pedido.tipo_envio = envio.id_envio " +
+                "WHERE cliente = ?");
 
-            pstmt.setInt(1, getId());
+            pstmt.setInt(1, cliente.getId());
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
+                Pedido pedido;                
+                HashMap<Produto, Integer> produtos = new HashMap<>();
+                int numPedido = rs.getInt(1);
+                String status = rs.getString(3);
+                java.sql.Date dataSqlC = rs.getDate(4);
+                LocalDate dataCriacao = dataSqlC.toLocalDate();
+                double valorTotal = rs.getDouble(5);
+                String formaPagamento = rs.getString(6);
+                java.sql.Date dataSqlE = rs.getDate(7);
+                LocalDate dataEnvio = dataSqlE.toLocalDate();
+                double valorFrete = rs.getInt(9);
+                String tipoEnvio = rs.getString(12);
+                double custoEnvio = rs.getDouble(13);
+
+                Endereco endereco = Endereco.buscaEndereco(rs.getInt(10));
+
+                PreparedStatement pstmt2 = connection.prepareStatement(
+                "SELECT * FROM " +
+                "produtos_pedido WHERE id_pedido = ?");
+
+                pstmt2.setInt(1, numPedido);
+
+                ResultSet rs2 = pstmt2.executeQuery();
+
+                while (rs2.next()) {
+                    Produto produto = Produto.buscaProduto(rs2.getInt(2));
+                    int quantidade = rs2.getInt(3);
+                    produtos.put(produto, quantidade);
+                }
+
+                pedido = new Pedido(numPedido, produtos, status, cliente, formaPagamento, endereco, dataCriacao, dataEnvio, tipoEnvio, custoEnvio, valorFrete, valorTotal);
+
+                pedidos.add(pedido);
+
             }
 
             return pedidos;
         } catch (Exception e) {
-            return null;
+            throw e;
         }
     }
 
