@@ -206,9 +206,9 @@ public class UsuarioTest {
             Produto produto1 = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
             Produto produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
             carrinho.esvaziarCarrinho();
-            carrinho.adicionarItem(produto1);
-            carrinho.adicionarItem(produto1);
-            carrinho.adicionarItem(produto2);
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto2, 1);
             
 
             Pedido pedido = carrinho.realizarPedido();
@@ -222,12 +222,12 @@ public class UsuarioTest {
             
             pedido.setEndereco(cliente.getEnderecos().get(0));
 
-            pedido.finalizarCompra();
+            pedido.finalizarCompra(carrinho);
             int idPedido1 = pedido.getNumPedido();
 
             carrinho.removerItem(produto1);
 
-            pedido.finalizarCompra();
+            pedido.finalizarCompra(carrinho);
             int idPedido2 = pedido.getNumPedido();
 
             assertNotNull(cliente.listarPedidos(cliente));

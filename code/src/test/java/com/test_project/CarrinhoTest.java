@@ -41,10 +41,10 @@ class CarrinhoTest {
      */
     @Test
     void adicionarItemTest(){
-        assertTrue(carrinho.adicionarItem(produto1));
-        assertTrue(carrinho.adicionarItem(produto2));
+        assertTrue(carrinho.adicionarItem(produto1, 1));
+        assertTrue(carrinho.adicionarItem(produto2, 2));
         assertEquals(1, carrinho.quantidadeProduto(produto1));
-        assertEquals(1, carrinho.quantidadeProduto(produto2));
+        assertEquals(2, carrinho.quantidadeProduto(produto2));
     }
 
     /**
@@ -52,8 +52,8 @@ class CarrinhoTest {
      */
     @Test
     void adicionarItemDuplicadoTest(){
-        carrinho.adicionarItem(produto1);
-        assertTrue(carrinho.adicionarItem(produto1));
+        carrinho.adicionarItem(produto1, 1);
+        assertTrue(carrinho.adicionarItem(produto1, 1));
         assertEquals(2, carrinho.quantidadeProduto(produto1));
     }
 
@@ -62,7 +62,7 @@ class CarrinhoTest {
      */
     @Test
     void removerItemTest(){
-        carrinho.adicionarItem(produto1);
+        carrinho.adicionarItem(produto1, 1);
         assertTrue(carrinho.removerItem(produto1));
         assertFalse(carrinho.removerItem(produto2));
         assertEquals(-1, carrinho.quantidadeProduto(produto1));
@@ -74,9 +74,9 @@ class CarrinhoTest {
      */
     @Test
     void removerItemPorDecrementoTest(){
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto1));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
         assertTrue(carrinho.removerItem(produto1, -2));
         assertEquals(1, carrinho.quantidadeProduto(produto1));
         assertTrue(carrinho.removerItem(produto1, -3));
@@ -88,9 +88,9 @@ class CarrinhoTest {
      */
     @Test
     void calcularTotalTest(){
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto2));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto2, 1));
         double preco = produto1.getPreco() * 2 + produto2.getPreco();
 
         assertEquals(preco, carrinho.calcularTotal());
@@ -101,9 +101,9 @@ class CarrinhoTest {
      */
     @Test
     void quantidadeProdutoTest(){
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto2));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto2, 1));
         
         assertEquals(2, carrinho.quantidadeProduto(produto1));
         assertEquals(1, carrinho.quantidadeProduto(produto2));
@@ -114,8 +114,8 @@ class CarrinhoTest {
      */
     @Test
     void produtosCarrinhoTest(){
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto2));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto2, 1));
         
         ArrayList<Produto> produtos = carrinho.produtosCarrinho();
 
@@ -127,8 +127,8 @@ class CarrinhoTest {
      */
     @Test
     void esvaziarCarrinhoTest(){
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto2));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto2, 1));
 
         carrinho.esvaziarCarrinho();
 
@@ -144,8 +144,8 @@ class CarrinhoTest {
     void realizarPedidoTest(){
         assertNull(carrinho.realizarPedido());
 
-        assertEquals(true, carrinho.adicionarItem(produto1));
-        assertEquals(true, carrinho.adicionarItem(produto2));
+        assertEquals(true, carrinho.adicionarItem(produto1, 1));
+        assertEquals(true, carrinho.adicionarItem(produto2, 1));
 
         assertNotNull(carrinho.realizarPedido());
     }
@@ -168,9 +168,9 @@ class CarrinhoTest {
 
             Map<Produto, Integer> dadosBanco = new HashMap<>();
 
-            carrinho.adicionarItem(produto1);
-            carrinho.adicionarItem(produto1);
-            carrinho.adicionarItem(produto1);
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto1, 1);
 
             carrinho.atualizarBanco();
             
@@ -207,8 +207,8 @@ class CarrinhoTest {
             dadosBanco.clear();
 
             carrinho.removerItem(produto1, -1);
-            carrinho.adicionarItem(produto2);
-            carrinho.adicionarItem(produto2);
+            carrinho.adicionarItem(produto2, 1);
+            carrinho.adicionarItem(produto2, 1);
 
             while (rs.next()) {
                 id = rs.getInt(1);
@@ -230,7 +230,7 @@ class CarrinhoTest {
             dadosBanco.clear();
 
             carrinho.removerItem(produto1);
-            carrinho.adicionarItem(produto2);
+            carrinho.adicionarItem(produto2, 1);
 
             while (rs.next()) {
                 id = rs.getInt(1);

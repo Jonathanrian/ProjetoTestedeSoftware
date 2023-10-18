@@ -33,9 +33,9 @@ public class PedidoTest {
         this.produto1 = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
         this.produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
         carrinho.esvaziarCarrinho();
-        this.carrinho.adicionarItem(produto1);
-        this.carrinho.adicionarItem(produto1);
-        this.carrinho.adicionarItem(produto2);
+        this.carrinho.adicionarItem(produto1, 1);
+        this.carrinho.adicionarItem(produto1, 1);
+        this.carrinho.adicionarItem(produto2, 1);
         
 
         this.pedido = this.carrinho.realizarPedido();
@@ -56,7 +56,7 @@ public class PedidoTest {
         
         this.pedido.setEndereco(cliente.getEnderecos().get(0));
 
-        assertTrue(this.pedido.finalizarCompra());
+        assertTrue(this.pedido.finalizarCompra(this.carrinho));
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
@@ -101,7 +101,7 @@ public class PedidoTest {
         
         this.pedido.setEndereco(cliente.getEnderecos().get(0));
 
-        assertTrue(this.pedido.finalizarCompra());
+        assertTrue(this.pedido.finalizarCompra(this.carrinho));
 
         this.pedido.cancelarPedido();
 
