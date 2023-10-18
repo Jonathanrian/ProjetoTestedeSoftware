@@ -73,6 +73,17 @@ public class Menus {
         System.out.println(" 3 -> Voltar");
     }
 
+    public static void telaProdutosFiltrados(ArrayList<Produto> produtos){
+        System.out.println(" ====  PRODUTOS  ====");
+
+        for (Produto produto : produtos) {
+            System.out.println(produto.toString());
+        }
+
+        System.out.println(" 1 -> Adicionar um Produto ao Carrinho");
+        System.out.println(" 2 -> Voltar");
+    }
+
     public static void telaPedidos(ArrayList<Pedido> pedidos, Usuario cliente){
         System.out.println("========== PEDIDOS ==========");
 
@@ -88,22 +99,11 @@ public class Menus {
 
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.print("Digite uma data no formato 'dd-MM-yyyy': ");
-        String dataTexto = scanner.nextLine();
-
-        try {
-            // Use um DateTimeFormatter com o formato 'dd-MM-yyyy' para analisar a entrada do usuário
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate data = LocalDate.parse(dataTexto, formatter);
-
-            System.out.println("Você digitou a data: " + data);
-        } catch (Exception e) {
-            System.err.println("Formato de data inválido. Use o formato 'dd-MM-yyyy'.");
-        }
-
-        scanner.close();
+    public static void telaFiltro(){
+        System.out.println("Filtre a busca pelo produto por:");
+        System.out.println(" 1 -> Nome");
+        System.out.println(" 2 -> Preço");
+        System.out.println(" 3 -> Categoria");
+        System.out.println(" 4 -> Voltar");
     }
 }
