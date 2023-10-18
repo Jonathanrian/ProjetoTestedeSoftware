@@ -3,6 +3,7 @@ package com.test_project;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 public class Produto {
     private int id;
@@ -71,6 +72,39 @@ public class Produto {
         }
     }
 
+    public static ArrayList<Produto> listarProdutos() throws Exception{
+        try {
+            ArrayList<Produto> produtos = new ArrayList<>();
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " +
+                "produto");
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Produto produto;
+                int id = rs.getInt(1);
+                String nome = rs.getString(2);
+                double preco = rs.getDouble(3);
+                String categoria = rs.getString(4);
+                int estoque = rs.getInt(5);
+                String descricao = rs.getString(6);
+                String fabricante = rs.getString(7);
+                int desconto = rs.getInt(8);
+                produto = new Produto(id, nome, preco, categoria, estoque, descricao, fabricante, desconto);
+
+                produtos.add(produto);
+            }
+
+            return produtos;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public int getId() {
         return id;
     }
@@ -102,9 +136,31 @@ public class Produto {
 
     @Override
     public String toString() {
-        return "Produto [id=" + id + ", nome=" + nome + ", preco=" + preco + ", categoria=" + categoria + ", estoque="
-                + estoque + ", descricao=" + descricao + ", fabricante=" + fabricante + ", desconto=" + desconto + "]";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("ID: ").append(id).append("\n");
+        sb.append("Produto: ").append(nome).append("\n");
+        sb.append("Preço: ").append(preco).append("\n");
+        sb.append("Categoria: ").append(categoria).append("\n");
+        sb.append("Estoque: ").append(estoque).append("\n");
+        sb.append("Descrição: ").append(descricao).append("\n");
+        sb.append("Fabricante: ").append(fabricante).append("\n");
+        sb.append("Desconto: ").append(desconto).append("\n");
+
+        return sb.toString();
     }
+
+    public String imprimirSimples() {
+        StringBuilder sb = new StringBuilder();
+    
+        sb.append("ID: ").append(id).append("\n");
+        sb.append("Produto: ").append(nome).append("\n");
+        sb.append("Preço: ").append(preco).append("\n");
+        sb.append("Categoria: ").append(categoria).append("\n");
+    
+        return sb.toString();
+    }
+    
     
 }
 
