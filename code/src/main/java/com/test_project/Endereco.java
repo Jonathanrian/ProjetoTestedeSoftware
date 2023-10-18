@@ -1,5 +1,8 @@
 package com.test_project;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +38,41 @@ public class Endereco {
         setComplemento(complemento);
         setCep(cep);
         setNumero(numero);
+    }
+
+    public static Endereco buscaEndereco(int id_endereco) throws Exception{
+        try {
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " +
+                "endereco WHERE id_endereco = ?");
+
+            pstmt.setInt(1, id_endereco);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            Endereco endereco = null;
+
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                String estado = rs.getString(3);
+                String cidade = rs.getString(4);
+                String bairro = rs.getString(5);
+                String rua = rs.getString(6);
+                int numero = rs.getInt(7);
+                String complemento = rs.getString(8);
+                String cep = rs.getString(9);
+
+                endereco = new Endereco(id, estado, cidade, bairro, rua, complemento, cep, numero);
+            }
+
+            return endereco;
+            
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public int getId() {
@@ -181,6 +219,8 @@ public class Endereco {
             return false; // Não deve ser nulo
         }
 
+        cep = cep.replaceAll("\\s+", "");
+
         // O padrão da expressão regular para um CEP no formato "99999-999"
         String padraoCEP = "\\d{5}-\\d{3}";
 
@@ -212,26 +252,23 @@ public class Endereco {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Endereco other = (Endereco) obj;
-        return id == other.id &&
-            numero == other.numero &&
-            Objects.equals(estado, other.estado) &&
-            Objects.equals(cidade, other.cidade) &&
-            Objects.equals(bairro, other.bairro) &&
-            Objects.equals(rua, other.rua) &&
-            Objects.equals(complemento, other.complemento) &&
-            Objects.equals(cep, other.cep);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Endereco endereco = (Endereco) o;
+        return id == endereco.id &&
+                Objects.equals(estado, endereco.estado) &&
+                Objects.equals(cidade, endereco.cidade) &&
+                Objects.equals(bairro, endereco.bairro) &&
+                Objects.equals(rua, endereco.rua) &&
+                Objects.equals(complemento, endereco.complemento) &&
+                Objects.equals(cep, endereco.cep) &&
+                numero == endereco.numero;
     }
-
+    
     @Override
     public int hashCode() {
         return Objects.hash(id, estado, cidade, bairro, rua, complemento, cep, numero);
-    }
+    }    
+
 }
