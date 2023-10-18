@@ -26,6 +26,24 @@ public class Pedido {
         this.valorProdutos = valorProdutos;
     }
 
+    public Pedido(int numPedido, HashMap<Produto, Integer> produtos, String status, Usuario cliente,
+            String formaPagamento, Endereco endereco, LocalDate dataCriacao, LocalDate dataEnvio,
+            String tipoEnvio, double custoEnvio, double valorFrete, double valorTotal) {
+        this.numPedido = numPedido;
+        this.produtos = produtos;
+        this.status = status;
+        this.cliente = cliente;
+        setValorProdutos();
+        this.formaPagamento = formaPagamento;
+        this.endereco = endereco;
+        this.dataCriacao = dataCriacao;
+        this.dataEnvio = dataEnvio;
+        this.tipoEnvio = tipoEnvio;
+        this.custoEnvio = custoEnvio;
+        this.valorFrete = valorFrete;
+        this.valorTotal = valorTotal;
+    }
+
     public boolean exibirDetalhes(){
         try {
             //Colocar uma forma legal de imprimir os detalhes talvez?
