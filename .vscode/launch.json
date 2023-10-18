@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.test_project.Main.Main",
+            "projectName": "code"
+        },
+        {
+            "type": "java",
             "name": "Carrinho",
             "request": "launch",
             "mainClass": "com.test_project.Carrinho",
@@ -19,16 +26,9 @@
         },
         {
             "type": "java",
-            "name": "App",
-            "request": "launch",
-            "mainClass": "com.test_project.App",
-            "projectName": "code"
-        },
-        {
-            "type": "java",
             "name": "Usuario",
             "request": "launch",
-            "mainClass": "com.test_project.Usuario",
+            "mainClass": "com.test_project.Main.Main",
             "projectName": "code"
         }
     ]

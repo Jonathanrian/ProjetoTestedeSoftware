@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,7 +27,7 @@ public class UsuarioTest {
      * @throws Exception
      */
     @Test
-    void cadastrar() throws Exception{
+    void cadastrarTest() throws Exception{
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
@@ -44,10 +45,37 @@ public class UsuarioTest {
             Usuario usuario = null;
 
             while (rs.next()) {
-                usuario = new Usuario(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
+                usuario = new Usuario(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
             }
 
+            //Teste para verificar se o cliente foi cadastrado com sucesso.
             assertEquals(this.cliente, usuario);
+
+            LocalDate data = LocalDate.of(2003, 7, 27);
+
+            Usuario clienteCPF = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "07769719305", "email@gmail.com", null, "renan123", "usuario", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um CPF que já está cadastrado.
+            */
+            assertFalse(clienteCPF.cadastrar());
+
+            Usuario clienteEmail = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "418.256.950-40", "renanleitedacosta@gmail.com", null, "renan123", "usuario", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um email que já está cadastrado.
+            */
+            assertFalse(clienteEmail.cadastrar());
+
+            Usuario clienteUsuario = new Usuario("FRANCISCO RENAN LEITE DA COSTA", "418.256.950-40", "email@gmail.com", null, "renan123", "RenanCosta", data);
+
+            /*
+            Teste para verificar se o método bloqueou o cadastro corretamente,
+            tendo em vista que o usuário que está sendo cadastrado possui um usuário que já está cadastrado.
+            */
+            assertFalse(clienteUsuario.cadastrar());
             
             cliente.excluirUsuario();
 
@@ -59,9 +87,10 @@ public class UsuarioTest {
     
     /**
      * Verifica se o método efetua o login do usuário corretamente.
+     * @throws Exception
      */
     @Test
-    void login(){
+    void loginTest() throws Exception{
 
         this.cliente.cadastrar();
 
@@ -80,11 +109,62 @@ public class UsuarioTest {
     }
 
     /**
+     * Verifica se o método cadastra o usuário corretamente no banco de dados.
+     * @throws Exception
+     */
+    @Test
+    void adicionarEnderecoTest() throws Exception{
+
+        try {
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+            
+            this.cliente.cadastrar();
+
+            this.cliente = Usuario.login("RenanCosta", "renan123");
+
+            Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+            this.cliente.adicionarEndereco(endereco);
+
+            assertTrue(this.cliente.getEnderecos().contains(endereco));
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "SELECT * FROM " + 
+                "endereco WHERE id_endereco = ?");
+
+            pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
+
+            ResultSet rs = pstmt.executeQuery();
+
+            Endereco endereco2 = null;
+
+            if (rs.next()) {
+                endereco2 = new Endereco(rs.getInt(1), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(8), rs.getString(9), rs.getInt(7));
+            }
+
+            assertEquals(this.cliente.getEnderecos().get(0), endereco2);
+
+            pstmt = connection.prepareStatement(
+                "DELETE FROM " + 
+                "endereco WHERE id_endereco = ?");
+
+                pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
+                pstmt.executeUpdate();
+            
+            cliente.excluirUsuario();
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    /**
      * Verifica se o método efetua o login do usuário corretamente.
      * @throws Exception
      */ 
     @Test
-    void excluirUsuario() throws Exception{
+    void excluirUsuarioTest() throws Exception{
 
         this.cliente.cadastrar();
 
@@ -102,6 +182,76 @@ public class UsuarioTest {
             ResultSet rs = pstmt.executeQuery();
 
             assertFalse(rs.next());
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    /**
+     * Verifica se o método retorna a lista de todos os pedidos do usuário corretamente.
+     * @throws Exception
+     */ 
+    @Test
+    void listarPedidosTest() throws Exception{
+
+        try {
+
+            this.cliente.cadastrar();
+
+            this.cliente = Usuario.login("RenanCosta", "renan123");
+
+            Carrinho carrinho = new Carrinho(cliente);
+            Produto produto1 = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
+            Produto produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
+            carrinho.esvaziarCarrinho();
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto1, 1);
+            carrinho.adicionarItem(produto2, 1);
+            
+
+            Pedido pedido = carrinho.realizarPedido();
+
+            pedido.setTipoEnvio("envio padrão");
+            pedido.setFormaPagamento("pix");
+
+            Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+            cliente.adicionarEndereco(endereco);
+            
+            pedido.setEndereco(cliente.getEnderecos().get(0));
+
+            pedido.finalizarCompra(carrinho);
+            int idPedido1 = pedido.getNumPedido();
+
+            carrinho.removerItem(produto1);
+
+            pedido.finalizarCompra(carrinho);
+            int idPedido2 = pedido.getNumPedido();
+
+            assertNotNull(cliente.listarPedidos(cliente));
+
+            try {
+                Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+                PreparedStatement pstmt = connection.prepareStatement(
+                "DELETE FROM " +
+                "produtos_pedido WHERE id_pedido = ?; " +
+                "DELETE FROM " +
+                "pedido WHERE id_pedido = ?;");
+
+                pstmt.setInt(1, idPedido1);
+                pstmt.setInt(2, idPedido1);
+                pstmt.executeUpdate();
+
+                pstmt.setInt(1, idPedido2);
+                pstmt.setInt(2, idPedido2);
+                pstmt.executeUpdate();
+
+            } catch (Exception e) {
+                throw e;
+            }
 
         } catch (Exception e) {
             throw e;
@@ -186,11 +336,19 @@ public class UsuarioTest {
         // Caso de sucesso: telefone válido de outro país, dos Estados Unidos nesse exemplo.
         String telefone5 = "+1 650-253-0000";
 
+        // Caso de sucesso: telefone válido pois o telefone é opcional
+        String telefone6 = "";
+
+        // Caso de sucesso: telefone válido pois o telefone é opcional
+        String telefone7 = null;
+
         assertTrue(cliente.setTelefone(telefone1, "BR"));
         assertFalse(cliente.setTelefone(telefone2, "BR"));
         assertTrue(cliente.setTelefone(telefone3, "BR"));
         assertFalse(cliente.setTelefone(telefone4, "BR"));
         assertTrue(cliente.setTelefone(telefone5, "US"));
+        assertTrue(cliente.setTelefone(telefone6, "BR"));
+        assertTrue(cliente.setTelefone(telefone7, "BR"));
     }
 
     /**

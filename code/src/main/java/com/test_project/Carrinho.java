@@ -1,7 +1,6 @@
 package com.test_project;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,12 +62,12 @@ public class Carrinho {
         }
     }
 
-    public boolean adicionarItem(Produto produto){
+    public boolean adicionarItem(Produto produto, int quantidade){
         try {
             if (this.produtos.containsKey(produto)) {
-            this.produtos.put(produto, this.produtos.get(produto) + 1);
+            this.produtos.put(produto, this.produtos.get(produto) + quantidade);
             } else{
-                this.produtos.put(produto, 1);
+                this.produtos.put(produto, quantidade);
             }
             return true;
         } catch (Exception e) {
@@ -170,7 +169,7 @@ public class Carrinho {
             Pedido pedido = null;
 
             if (!this.produtos.isEmpty() && cliente != null) {
-                pedido = new Pedido(produtos, cliente, this.calcularTotal(), LocalDate.now());
+                pedido = new Pedido(produtos, cliente, this.calcularTotal());
             }
                 
             return pedido;
@@ -278,7 +277,20 @@ public class Carrinho {
 
     @Override
     public String toString() {
-        return "Carrinho [cliente=" + cliente + ", produtos=" + produtos + "]";
+        StringBuilder sb = new StringBuilder();
+    
+        for (Map.Entry<Produto, Integer> entry : produtos.entrySet()) {
+            Produto produto = entry.getKey();
+            int quantidade = entry.getValue();
+    
+            sb.append("\n");
+            sb.append(produto.imprimirSimples());
+            sb.append("Quantidade: ").append(quantidade).append("\n");
+        }
+
+        sb.append("\n\nValor Total: ").append(calcularTotal()).append("\n");
+    
+        return sb.toString();
     }
 
     @Override
