@@ -269,6 +269,22 @@ public class Endereco {
     @Override
     public int hashCode() {
         return Objects.hash(id, estado, cidade, bairro, rua, complemento, cep, numero);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("ID: ").append(id).append("\n");
+        sb.append(rua).append("\n");
+        sb.append("Número ").append(numero);
+        if (!complemento.isEmpty()) {
+            sb.append(", ").append(complemento);
+        }
+        sb.append(" - ").append(bairro).append("\n");
+        sb.append("CEP ").append(cep).append(" - ").append(cidade).append(", ").append(estado);
+
+        return sb.toString();
     }    
 
 }
