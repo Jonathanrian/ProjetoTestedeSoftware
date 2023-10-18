@@ -278,7 +278,7 @@ class CarrinhoTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         cliente.excluirUsuario();
     }
 

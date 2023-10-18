@@ -45,7 +45,7 @@ public class UsuarioTest {
             Usuario usuario = null;
 
             while (rs.next()) {
-                usuario = new Usuario(rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
+                usuario = new Usuario(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(7), rs.getString(6), rs.getDate(8).toLocalDate());
             }
 
             //Teste para verificar se o cliente foi cadastrado com sucesso.
@@ -87,9 +87,10 @@ public class UsuarioTest {
     
     /**
      * Verifica se o método efetua o login do usuário corretamente.
+     * @throws Exception
      */
     @Test
-    void loginTest(){
+    void loginTest() throws Exception{
 
         this.cliente.cadastrar();
 

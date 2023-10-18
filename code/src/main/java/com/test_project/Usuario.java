@@ -30,6 +30,20 @@ public class Usuario {
             String usuario, LocalDate dataNasc) {
         this.nome_completo = nome_completo;
         this.cpf = cpf;
+        setCpf(this.cpf);
+        this.email = email;
+        this.telefone = telefone;
+        this.senha = senha;
+        this.usuario = usuario;
+        this.dataNasc = dataNasc;
+    }
+
+    public Usuario(int id, String nome_completo, String cpf, String email, String telefone, String senha,
+            String usuario, LocalDate dataNasc) {
+        this.id = id;
+        this.nome_completo = nome_completo;
+        this.cpf = cpf;
+        setCpf(this.cpf);
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
@@ -71,7 +85,8 @@ public class Usuario {
                     pstmt = connection.prepareStatement(
                         "INSERT INTO " + 
                         "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" + 
-                        "VALUES(?, ?, ?, ?, ?, ?, ?)");
+                        "VALUES(?, ?, ?, ?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS);
 
                         pstmt.setString(1, getNome_completo());
                         pstmt.setString(2, getCpf());
@@ -81,6 +96,17 @@ public class Usuario {
                         pstmt.setString(6, getSenha());
                         pstmt.setDate(7, Date.valueOf(dataNasc));
                         pstmt.executeUpdate();
+
+                        int idCliente = 0;
+
+                        ResultSet keyCliente = pstmt.getGeneratedKeys();
+                        if (keyCliente.next()) {
+                            
+                            idCliente = keyCliente.getInt(1);
+                            setId(idCliente);
+                        } else{
+                            return false;
+                        }
 
                     return true;
                 }
@@ -234,21 +260,23 @@ public class Usuario {
         }
     }
 
-    public boolean excluirUsuario(){
+    public boolean excluirUsuario() throws Exception{
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
             PreparedStatement pstmt = connection.prepareStatement(
                 "DELETE FROM " + 
-                "cliente WHERE cpf = ?");
+                "endereco WHERE cliente = ?; " +
+                "DELETE FROM " + 
+                "cliente WHERE id_cliente = ?");
 
-            pstmt.setString(1, getCpf());
+            pstmt.setInt(1, getId());
+            pstmt.setInt(2, getId());
             pstmt.executeUpdate();
 
             return true;
         } catch (Exception e) {
-            System.out.println(e);
-            return false;
+            throw e;
         }
     }
 
@@ -357,6 +385,8 @@ public class Usuario {
                 System.out.println("O CPF não pode ser nulo!");
                 return false; // Não deve ser nulo
             }
+            
+            cpf = cpf.replaceAll("\\s+", "");
 
             cpf = cpf.replaceAll("[^0-9]", "");
 

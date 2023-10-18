@@ -77,6 +77,8 @@ public class PedidoTest {
             pstmt.setInt(1, this.pedido.getNumPedido());
             pstmt.executeUpdate();
 
+            this.cliente.excluirUsuario();
+
         } catch (Exception e) {
             
         }
@@ -267,7 +269,7 @@ public class PedidoTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         cliente.excluirUsuario();
     }
 }
