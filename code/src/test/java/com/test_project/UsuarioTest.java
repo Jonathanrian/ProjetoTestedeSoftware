@@ -77,7 +77,7 @@ public class UsuarioTest {
             */
             assertFalse(clienteUsuario.cadastrar());
             
-            cliente.excluirUsuario();
+            cliente.excluirUsuario(this.cliente);
 
         } catch (Exception e) {
             throw e;
@@ -104,7 +104,7 @@ public class UsuarioTest {
 
         assertNull(cliente3);
 
-        this.cliente.excluirUsuario();
+        this.cliente.excluirUsuario(this.cliente);
 
     }
 
@@ -151,7 +151,7 @@ public class UsuarioTest {
                 pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
                 pstmt.executeUpdate();
             
-            cliente.excluirUsuario();
+            cliente.excluirUsuario(this.cliente);
 
         } catch (Exception e) {
             throw e;
@@ -168,7 +168,7 @@ public class UsuarioTest {
 
         this.cliente.cadastrar();
 
-        this.cliente.excluirUsuario();
+        this.cliente.excluirUsuario(this.cliente);
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();

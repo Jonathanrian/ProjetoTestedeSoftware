@@ -238,11 +238,20 @@ public class Usuario {
         }
     }
 
-    public boolean excluirEndereco(int id_endereco) throws Exception{
+    public boolean excluirEndereco(int id_endereco, Usuario cliente) throws Exception{
         try {
 
             boolean encontrado = false;
             Endereco enderecoParaRemover = null;
+
+            ArrayList<Pedido> pedidos = listarPedidos(cliente);
+
+            for (Pedido pedido : pedidos) {
+                if (pedido.getEndereco().getId() == id_endereco) {
+                    System.out.println("Existe pedidos com esse endereço!");
+                    return false;
+                }
+            }
 
             for (Endereco endereco : this.enderecos) {
                 if (endereco.getId() == id_endereco) {
@@ -339,11 +348,34 @@ public class Usuario {
         }
     }
 
-    public boolean excluirUsuario() throws Exception{
+    public boolean excluirUsuario(Usuario cliente) throws Exception{
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
 
-            PreparedStatement pstmt = connection.prepareStatement(
+            ArrayList<Pedido> pedidos = cliente.listarPedidos(cliente);
+
+            PreparedStatement pstmt;
+
+            for (Pedido pedido : pedidos) {
+                
+                pstmt = connection.prepareStatement(
+                    "DELETE FROM " +
+                    "produtos_pedido WHERE id_pedido = ?"
+                );
+    
+                pstmt.setInt(1, pedido.getNumPedido());
+                pstmt.executeUpdate();
+    
+                pstmt = connection.prepareStatement(
+                    "DELETE FROM " +
+                    "pedido WHERE id_pedido = ?"
+                );
+    
+                pstmt.setInt(1, pedido.getNumPedido());
+                pstmt.executeUpdate();
+            }
+
+            pstmt = connection.prepareStatement(
                 "DELETE FROM " + 
                 "endereco WHERE cliente = ?; " +
                 "DELETE FROM " + 

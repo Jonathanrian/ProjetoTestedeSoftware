@@ -337,7 +337,7 @@ public class Main {
                                                         System.out.println("ID do endereço que será excluído: ");
                                                         int idEndereco = sc.nextInt();
 
-                                                        if (cliente.excluirEndereco(idEndereco)) {
+                                                        if (cliente.excluirEndereco(idEndereco, cliente)) {
                                                             System.out.println("Endereço excluído com sucesso!");
                                                         } else{
                                                             System.out.println("Não foi possível excluir o endereço!");
@@ -430,7 +430,7 @@ public class Main {
                                                 int excluirPerfil = sc.nextInt();
 
                                                 if (excluirPerfil == 1) {
-                                                    if (cliente.excluirUsuario()) {
+                                                    if (cliente.excluirUsuario(cliente)) {
                                                         System.out.println("Seu perfil foi excluído com sucesso!");
                                                         cliente = null;
                                                     }else{
