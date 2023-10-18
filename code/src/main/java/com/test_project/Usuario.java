@@ -81,7 +81,21 @@ public class Usuario {
                 pstmt.setString(3, getEmail());
                 ResultSet rs = pstmt.executeQuery();
 
-                if (!rs.next()) {
+                if (rs.next()) {
+
+                    String cpfComp = rs.getString(3).replaceAll("\\s+", "");
+
+                    if (this.cpf.equals(cpfComp)) {
+                        System.out.println("\nCPF já cadastrado!");
+                    } 
+                    if (this.email.equals(rs.getString(4))) {
+                        System.out.println("\nEmail já cadastrado!");
+                    }
+                    if (this.usuario.equals(rs.getString(6))) {
+                        System.out.println("\nUsuário já cadastrado!");
+                    }
+
+                } else{
                     pstmt = connection.prepareStatement(
                         "INSERT INTO " + 
                         "cliente(nome_completo, cpf, email, telefone, usuario, senha, datanasc)" + 
@@ -109,6 +123,7 @@ public class Usuario {
                         }
 
                     return true;
+                    
                 }
 
                 return false;
@@ -223,6 +238,41 @@ public class Usuario {
         }
     }
 
+    public boolean excluirEndereco(int id_endereco) throws Exception{
+        try {
+
+            boolean encontrado = false;
+            Endereco enderecoParaRemover = null;
+
+            for (Endereco endereco : this.enderecos) {
+                if (endereco.getId() == id_endereco) {
+                    enderecoParaRemover = endereco;
+                    encontrado = true;
+                }
+            }
+
+            if (!encontrado) {
+                return false;
+            }
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "DELETE FROM " + 
+                "endereco WHERE id_endereco = ?");
+            
+            pstmt.setInt(1, id_endereco);
+            pstmt.executeUpdate();
+
+            this.enderecos.remove(enderecoParaRemover);
+
+            return true;
+            
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public boolean validarDados(){
         try {
 
@@ -244,11 +294,40 @@ public class Usuario {
         }
     }
 
-    public boolean editarInformacoes(){
+    public boolean editarInformacoes(String nome_completo, String email, String telefone, String senha,
+            String usuario, LocalDate dataNasc) throws Exception{
         try {
+            setNome_completo(nome_completo != null ? nome_completo : getNome_completo());
+            setEmail(email != null ? email : getEmail());
+            setTelefone(telefone != null ? telefone : getTelefone(), "BR");
+            setUsuario(usuario != null ? usuario : getUsuario());
+            setSenha(senha != null ? senha : getSenha());
+            setDataNasc(dataNasc != null ? dataNasc : getDataNasc());
+
+            Connection connection = PostgreSQLConnection.getInstance().getConnection();
+
+            PreparedStatement pstmt = connection.prepareStatement(
+                "UPDATE cliente " + 
+                "SET nome_completo = ?, " + 
+                "email = ?, " +
+                "telefone = ?, " +
+                "usuario = ?, " +
+                "senha = ?, " +
+                "datanasc = ? " +
+                "WHERE id_cliente = ?");
+
+                pstmt.setString(1, this.nome_completo);
+                pstmt.setString(2, this.email);
+                pstmt.setString(3, this.telefone);
+                pstmt.setString(4, this.usuario);
+                pstmt.setString(5, this.senha);
+                pstmt.setDate(6, Date.valueOf(this.dataNasc));
+                pstmt.setInt(7, this.id);
+                pstmt.executeUpdate();
+            
             return true;
         } catch (Exception e) {
-            return false;
+            throw e;
         }
     }
 
@@ -350,25 +429,25 @@ public class Usuario {
     }
     public boolean setNome_completo(String nome_completo) {
         if (nome_completo == null) {
-            System.out.println("O nome não pode estar vazio!");
+            System.out.println("\nO nome não pode estar vazio!");
             return false; // Não deve ser nulo
         }
         
         // Comprimento mínimo e máximo
         if (nome_completo.length() < 4 || nome_completo.length() > 100) {
-            System.out.println("Quantidade de caracteres inválidas!");
+            System.out.println("\nQuantidade de caracteres inválidas!");
             return false;
         }
         
         // Caracteres válidos (permite letras, espaços, hífens, apóstrofos e acentos)
         if (!nome_completo.matches("^[\\p{L}\\s'-]+$")) {
-            System.out.println("Não é permitido símbolos no nome!");
+            System.out.println("\nNão é permitido símbolos no nome!");
             return false;
         }
         
         // Evita números
         if (nome_completo.matches(".*\\d.*")) {
-            System.out.println("O nome não deve haver números!");
+            System.out.println("\nO nome não deve haver números!");
             return false;
         }
         
@@ -382,7 +461,10 @@ public class Usuario {
         CPFValidator cpfValidator = new CPFValidator(); 
         try {
             if (cpf == null) {
-                System.out.println("O CPF não pode ser nulo!");
+                if (this.email != null) {
+                    
+                    System.out.println("\nO CPF não pode ser nulo!");
+                }
                 return false; // Não deve ser nulo
             }
             
@@ -397,7 +479,7 @@ public class Usuario {
             return true;
 
         } catch (Exception e) {
-            System.out.println("CPF inválido!");
+            System.out.println("\nCPF inválido!");
             return false;
         }
     }
@@ -407,7 +489,7 @@ public class Usuario {
     public boolean setEmail(String email) {
         try {
             if (email == null) {
-                System.out.println("O email não pode ser nulo!");
+                System.out.println("\nO email não pode ser nulo!");
                 return false; // Não deve ser nulo
             }
 
@@ -418,7 +500,7 @@ public class Usuario {
             return true;
 
         } catch (AddressException e) {
-            System.out.println("Email inválido!");
+            System.out.println("\nEmail inválido!");
             return false;
         }
     }
@@ -439,7 +521,7 @@ public class Usuario {
             return phoneNumberUtil.isValidNumber(numero);
 
         } catch (NumberParseException e) {
-            System.out.println("Telefone inválido!");
+            System.out.println("\nTelefone inválido!");
             return false;
         }
     }
@@ -449,13 +531,13 @@ public class Usuario {
     public boolean setSenha(String senha) {
 
         if (senha == null) {
-            System.out.println("A senha não pode ser nula!");
+            System.out.println("\nA senha não pode ser nula!");
             return false; // Não deve ser nulo
         }
 
         // Comprimento mínimo e máximo
         if (senha.length() < 8 || senha.length() > 40) {
-            System.out.println("Quantidade de caracteres inválido!");
+            System.out.println("\nQuantidade de caracteres inválido!");
             return false;
         }
 
@@ -468,19 +550,19 @@ public class Usuario {
     public boolean setUsuario(String usuario) {
 
         if (usuario == null) {
-            System.out.println("O usuário não pode estar vazio!");
+            System.out.println("\nO usuário não pode estar vazio!");
             return false; // Não deve ser nulo
         }
         
         // Comprimento mínimo e máximo
         if (usuario.length() < 3 || usuario.length() > 50) {
-            System.out.println("Quantidade de caracteres inválidas!");
+            System.out.println("\nQuantidade de caracteres inválidas!");
             return false;
         }
         
         // Caracteres válidos (permite letras, espaços, hífens, apóstrofos, acentos e números.)
         if (!usuario.matches("^[\\p{L}0-9\\s'-]+$")) {
-            System.out.println("Não é permitido símbolos no usuário!");
+            System.out.println("\nNão é permitido símbolos no usuário!");
             return false;
         }
 
@@ -500,28 +582,28 @@ public class Usuario {
     public boolean setDataNasc(LocalDate dataNasc) {
 
         if (dataNasc == null) {
-            System.out.println("A data de nascimento não pode ser nula!");
+            System.out.println("\nA data de nascimento não pode ser nula!");
             return false; // Não deve ser nulo
         }
 
         //A data não pode estar no futuro
         LocalDate dataAtual = LocalDate.now();
         if (dataNasc.isAfter(dataAtual)) {
-            System.out.println("A data de nascimento não pode estar no futuro!");
+            System.out.println("\nA data de nascimento não pode estar no futuro!");
             return false;
         }
 
         //A data não pode estar muito no passado
         LocalDate dataMinima = dataAtual.minusYears(110);
         if (dataNasc.isBefore(dataMinima)) {
-            System.out.println("A data não pode estar muito tempo no passado!");
+            System.out.println("\nA data não pode estar muito tempo no passado!");
             return false;
         }
 
         //A data não pode estar depois de 18 anos antes, ou seja o usuário não pode ter menos de 18 anos.
         LocalDate idadeMinima = dataAtual.minusYears(18);
         if (dataNasc.isAfter(idadeMinima)) {
-            System.out.println("O usuário não pode ter menos de 18 anos!");
+            System.out.println("\nO usuário não pode ter menos de 18 anos!");
             return false;
         }
 
@@ -531,10 +613,32 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario [id=" + id + ", nome_completo=" + nome_completo + ", cpf=" + cpf + ", email=" + email
-                + ", telefone=" + telefone + ", senha=" + senha + ", usuario=" + usuario + ", enderecos=" + enderecos
-                + ", dataNasc=" + dataNasc + "]";
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("ID: ").append(id).append("\n");
+        sb.append("Usuário: ").append(usuario).append("\n");
+        sb.append("Nome Completo: ").append(nome_completo).append("\n");
+        sb.append("CPF: ").append(formatarCPF(cpf)).append("\n");
+        sb.append("E-mail: ").append(email).append("\n");
+        sb.append("Telefone: ").append(telefone).append("\n");
+        sb.append("Data de Nascimento: ").append(dataNasc).append("\n");
+
+        sb.append("\nEndereços:\n");
+        for (Endereco endereco : enderecos) {
+            sb.append("  - ").append(endereco).append("\n");
+        }
+
+        return sb.toString();
     }
+
+    // Método para formatar o CPF com pontos e traço
+    private String formatarCPF(String cpf) {
+        if (cpf != null && cpf.length() == 11) {
+            return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9);
+        }
+        return cpf;
+    }
+
 
     @Override
     public boolean equals(Object obj) {
