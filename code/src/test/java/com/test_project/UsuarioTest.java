@@ -109,7 +109,7 @@ public class UsuarioTest {
     }
 
     /**
-     * Verifica se o método cadastra o usuário corretamente no banco de dados.
+     * Verifica se o método cadastra o endereço corretamente.
      * @throws Exception
      */
     @Test
@@ -150,6 +150,52 @@ public class UsuarioTest {
 
                 pstmt.setInt(1, this.cliente.getEnderecos().get(0).getId());
                 pstmt.executeUpdate();
+            
+            cliente.excluirUsuario(this.cliente);
+
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    /**
+     * Verifica se o método cadastra o endereço corretamente.
+     * @throws Exception
+     */
+    @Test
+    void excluirEnderecoTest() throws Exception{
+
+        try {
+            
+            this.cliente.cadastrar();
+
+            this.cliente = Usuario.login("RenanCosta", "renan123");
+
+            Endereco endereco = new Endereco("rn", "Pau dos Ferros", "Vila Bela", "Rua das Acácias", "casa", "62980-000", 404);
+
+            this.cliente.adicionarEndereco(endereco);
+
+            assertTrue(cliente.excluirEndereco(endereco.getId(), cliente));
+
+            Carrinho carrinho = new Carrinho(cliente);
+            Produto produto1 = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
+            Produto produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
+
+            carrinho.adicionarItem(produto1, 3);
+            carrinho.adicionarItem(produto2, 3);
+
+            Pedido pedido = carrinho.realizarPedido();
+
+            this.cliente.adicionarEndereco(endereco);
+
+            pedido.setTipoEnvio("envio padrão");
+            pedido.setFormaPagamento("pix");
+            pedido.setEndereco(cliente.getEnderecos().get(0));
+
+            pedido.finalizarCompra(carrinho);
+
+            assertFalse(cliente.excluirEndereco(endereco.getId(), cliente));
             
             cliente.excluirUsuario(this.cliente);
 
@@ -252,6 +298,8 @@ public class UsuarioTest {
             } catch (Exception e) {
                 throw e;
             }
+
+            cliente.excluirUsuario(cliente);
 
         } catch (Exception e) {
             throw e;
