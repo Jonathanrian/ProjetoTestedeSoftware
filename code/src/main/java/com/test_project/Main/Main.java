@@ -706,7 +706,6 @@ public class Main {
 
                                                     new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
 
-
                                                     for (Produto produto : produtos) {
                                                         System.out.println(produto.toString());
                                                     }
@@ -753,8 +752,277 @@ public class Main {
                                                 break;
     
                                             case 2:
-    
+                                                
+                                                do {
+                                                    new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+                                                    Menus.telaFiltro();
+                                                    System.out.print("  >> ");
+                                                    op = sc.nextInt();
 
+                                                    ArrayList<Produto> produtosFiltrados = new ArrayList<>();
+
+                                                    switch (op) {
+                                                        case 1:
+
+                                                            sc.nextLine();
+                                                            System.out.print("\nNome do produto: ");
+                                                            String nome = sc.nextLine();
+
+                                                            for (Produto produto : produtos) {
+                                                                if (produto.getNome().equals(nome)) {
+                                                                    produtosFiltrados.add(produto);
+                                                                }
+                                                            }
+
+                                                            if (produtosFiltrados.isEmpty()) {
+                                                                System.out.println("Não há nenhum produto com esse nome!");   
+                                                                System.out.println("Pressione Enter para continuar!");
+                                                                sc.nextLine();
+                                                                sc.nextLine();
+
+                                                            } else{
+                                                                new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+                                                                Menus.telaProdutosFiltrados(produtosFiltrados);
+                                                                System.out.print("  >> ");
+                                                                op = sc.nextInt();
+
+                                                                switch (op) {
+                                                                    case 1:
+
+                                                                        adicionou = false;
+                                                                        encontrou = false;
+
+                                                                        do {
+
+                                                                            new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                System.out.println(produto.toString());
+                                                                            }
+
+                                                                            System.out.print("ID do produto: ");
+                                                                            int idProduto = sc.nextInt();
+                                                                            System.out.print("Quantidade: ");
+                                                                            int quantidade = sc.nextInt();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                if (produto.getId() == idProduto) {
+                                                                                    encontrou = true;
+                                                                                    if (quantidade > 0 && quantidade < produto.getEstoque()) {
+                                                                                        if (carrinho.adicionarItem(produto, quantidade)) {
+                                                                                            adicionou = true;
+                                                                                        }
+                                                                                    } else{
+                                                                                        System.out.println("\nQuantidade inválida!");
+                                                                                        System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                        op = sc.nextInt();
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            if (!encontrou) {
+                                                                                System.out.println("\nID inválido!");
+                                                                                System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                op = sc.nextInt();
+                                                                            }
+                                                                            
+                                                                        } while (!adicionou && op == 1);
+
+                                                                        if (adicionou) {
+                                                                            
+                                                                            System.out.println("\nItem adicionado com sucesso!");
+                                                                            System.out.println("Pressione Enter para continuar!");
+                                                                            sc.nextLine();
+                                                                            sc.nextLine();
+                                                                        }
+
+
+                                                                        op = 1;
+                                                                        
+                                                                        break;
+                                                                                                
+                                                                    case 2:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            
+                                                            break;
+
+                                                        case 2:
+
+                                                            System.out.print("\nPreço mínimo: ");
+                                                            double preco = sc.nextDouble();
+
+                                                            for (Produto produto : produtos) {
+                                                                if (produto.getPreco() <= preco) {
+                                                                    produtosFiltrados.add(produto);
+                                                                }
+                                                            }
+
+                                                            if (produtosFiltrados.isEmpty()) {
+                                                                System.out.println("Não há nenhum produto com esse preço ou menor!");
+                                                                System.out.println("Pressione Enter para continuar!");
+                                                                sc.nextLine();
+                                                                sc.nextLine();   
+
+                                                            } else{
+                                                                new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+                                                                Menus.telaProdutosFiltrados(produtosFiltrados);
+                                                                System.out.print("  >> ");
+                                                                op = sc.nextInt();
+
+                                                                switch (op) {
+                                                                    case 1:
+
+                                                                        adicionou = false;
+                                                                        encontrou = false;
+
+                                                                        do {
+
+                                                                            new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                System.out.println(produto.toString());
+                                                                            }
+
+                                                                            System.out.print("ID do produto: ");
+                                                                            int idProduto = sc.nextInt();
+                                                                            System.out.print("Quantidade: ");
+                                                                            int quantidade = sc.nextInt();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                if (produto.getId() == idProduto) {
+                                                                                    encontrou = true;
+                                                                                    if (quantidade > 0 && quantidade < produto.getEstoque()) {
+                                                                                        if (carrinho.adicionarItem(produto, quantidade)) {
+                                                                                            adicionou = true;
+                                                                                        }
+                                                                                    } else{
+                                                                                        System.out.println("\nQuantidade inválida!");
+                                                                                        System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                        op = sc.nextInt();
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            if (!encontrou) {
+                                                                                System.out.println("\nID inválido!");
+                                                                                System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                op = sc.nextInt();
+                                                                            }
+                                                                            
+                                                                        } while (!adicionou && op == 1);
+
+                                                                        if (adicionou) {
+                                                                            
+                                                                            System.out.println("\nItem adicionado com sucesso!");
+                                                                            System.out.println("Pressione Enter para continuar!");
+                                                                            sc.nextLine();
+                                                                            sc.nextLine();
+                                                                        }
+
+
+                                                                        op = 1;
+                                                                        
+                                                                        break;
+                                                                                                
+                                                                    case 2:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            
+                                                            break;
+                                                        case 3:
+
+                                                            sc.nextLine();
+                                                            System.out.print("\nNome da categoria: ");
+                                                            String categoria = sc.nextLine();
+
+                                                            for (Produto produto : produtos) {
+                                                                if (produto.getCategoria().equals(categoria)) {
+                                                                    produtosFiltrados.add(produto);
+                                                                }
+                                                            }
+
+                                                            if (produtosFiltrados.isEmpty()) {
+                                                                System.out.println("Não há nenhum produto com essa categoria!");   
+                                                                System.out.println("Pressione Enter para continuar!");
+                                                                sc.nextLine();
+                                                                sc.nextLine();
+
+                                                            } else{
+                                                                new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+                                                                Menus.telaProdutosFiltrados(produtosFiltrados);
+                                                                System.out.print("  >> ");
+                                                                op = sc.nextInt();
+
+                                                                switch (op) {
+                                                                    case 1:
+
+                                                                        adicionou = false;
+                                                                        encontrou = false;
+
+                                                                        do {
+
+                                                                            new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                System.out.println(produto.toString());
+                                                                            }
+
+                                                                            System.out.print("ID do produto: ");
+                                                                            int idProduto = sc.nextInt();
+                                                                            System.out.print("Quantidade: ");
+                                                                            int quantidade = sc.nextInt();
+
+                                                                            for (Produto produto : produtosFiltrados) {
+                                                                                if (produto.getId() == idProduto) {
+                                                                                    encontrou = true;
+                                                                                    if (quantidade > 0 && quantidade < produto.getEstoque()) {
+                                                                                        if (carrinho.adicionarItem(produto, quantidade)) {
+                                                                                            adicionou = true;
+                                                                                        }
+                                                                                    } else{
+                                                                                        System.out.println("\nQuantidade inválida!");
+                                                                                        System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                        op = sc.nextInt();
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                            if (!encontrou) {
+                                                                                System.out.println("\nID inválido!");
+                                                                                System.out.println("Digite 1 se deseja tentar novamente!");
+                                                                                op = sc.nextInt();
+                                                                            }
+                                                                            
+                                                                        } while (!adicionou && op == 1);
+
+                                                                        if (adicionou) {
+                                                                            
+                                                                            System.out.println("\nItem adicionado com sucesso!");
+                                                                            System.out.println("Pressione Enter para continuar!");
+                                                                            sc.nextLine();
+                                                                            sc.nextLine();
+                                                                        }
+
+
+                                                                        op = 1;
+                                                                        
+                                                                        break;
+                                                                                                
+                                                                    case 2:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            
+                                                            break;
+                                                            
+                                                        case 4:
+                                                            
+                                                            break;
+                                                    }
+                                                } while (op != 4);
     
                                                 break;
 
