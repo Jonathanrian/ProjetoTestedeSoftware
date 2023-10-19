@@ -61,7 +61,7 @@ public class EnderecoTest {
         // Caso de erro: cidade com símbolos
         String cidade6 = "Pau dos Ferros!!";
 
-        // Caso de erro: cidade inválida, com poucos caracteres
+        // Caso de erro: cidade inválida, com muitos caracteres
         String cidade7 = "aBeDfGhIJkLmNpQrStUvWxYzCcFwHjKlNpOqRsVtZbDfGhXjLmNpRtVwYzCcFaBeDfGhIJkLmNpQrStUvWxYzCcFwHjKlNpOqRsVt";
 
         assertTrue(endereco.setCidade(cidade1));
