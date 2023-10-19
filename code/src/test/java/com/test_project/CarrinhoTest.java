@@ -32,8 +32,8 @@ class CarrinhoTest {
         this.cliente = Usuario.login("RenanCosta", "renan123");
         this.carrinho = new Carrinho(cliente);
         this.produto1 = new Produto(2, "Mouse Gamer HyperX", 160, "periféricos", 50, "Oferece aos jogadores o melhor em estilo e conteúdo, oferecendo extrema precisão graças a seu sensor Pixart 3389 e efeitos de iluminação RGB espetaculares em 360°", "HyperX ", 0);
-            this.produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
-            carrinho.esvaziarCarrinho();
+        this.produto2 = new Produto(1, "celular A12", 1300, "smartphone", 50, "Um celular", "SAMSUNG", 0);
+        carrinho.esvaziarCarrinho();
     }
 
     /**
