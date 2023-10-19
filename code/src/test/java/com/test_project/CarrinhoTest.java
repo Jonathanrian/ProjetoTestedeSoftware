@@ -120,6 +120,10 @@ class CarrinhoTest {
         ArrayList<Produto> produtos = carrinho.produtosCarrinho();
 
         assertTrue(produtos.contains(produto1) && produtos.contains(produto2));
+
+        carrinho.removerItem(produto1);
+
+        assertEquals(-1, carrinho.quantidadeProduto(produto1));
     }
 
     /**
