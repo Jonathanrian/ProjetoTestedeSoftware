@@ -1,9 +1,6 @@
 package com.test_project.Main;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import com.test_project.Carrinho;
 import com.test_project.Pedido;
@@ -105,5 +102,20 @@ public class Menus {
         System.out.println(" 2 -> Preço");
         System.out.println(" 3 -> Categoria");
         System.out.println(" 4 -> Voltar");
+    }
+
+    public static ArrayList<String> telaCategoria(ArrayList<Produto> produtos){
+        ArrayList<String> categorias = new ArrayList<>();
+        for (int i = 0; i < produtos.size(); i++) {
+            if (!categorias.contains(produtos.get(i).getCategoria())) {
+                categorias.add(produtos.get(i).getCategoria());
+            }
+        }
+
+        for (int i = 0; i < categorias.size(); i++) {
+            System.out.println(" " + (i+1) + " -> " + categorias.get(i));
+        }
+
+        return categorias;
     }
 }
