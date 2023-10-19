@@ -397,6 +397,7 @@ public class Main {
                                                                 if (pedido.getNumPedido() == idPedido) {
                                                                     encontrado = true;
                                                                     if (pedido.cancelarPedido()) {
+                                                                        pedidos = cliente.listarPedidos(cliente);
                                                                         System.out.println("Pedido cancelado com sucesso!");
                                                                     } else{
                                                                         System.out.println("Não foi possível cancelar o pedido!");
@@ -465,6 +466,8 @@ public class Main {
                                     do {
 
                                         new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+
+                                        carrinho.atualizarBanco();
 
                                         Menus.carrinhoUsuario(carrinho);
                                         System.out.print("  >> ");
@@ -582,8 +585,8 @@ public class Main {
                                                 System.out.println(" ====  REALIZAR PEDIDO  ====");
 
                                                 sc.nextLine();
-                                                System.out.println(" 1 -> Envio Padrão");
-                                                System.out.println(" 2 -> Envio Expresso");
+                                                System.out.println(" 1 -> Envio Padrão (R$10.0)");
+                                                System.out.println(" 2 -> Envio Expresso (R$20.0)");
                                                 System.out.print("Selecione um tipo de envio: ");
                                                 int idTipoEnvio = sc.nextInt();
                                                 String tipoEnvio = "";
@@ -693,6 +696,8 @@ public class Main {
                                     do {
                                         
                                         new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
+
+                                        carrinho.atualizarBanco();
     
                                         Menus.telaProdutos(produtos);
                                         System.out.print("  >> ");
