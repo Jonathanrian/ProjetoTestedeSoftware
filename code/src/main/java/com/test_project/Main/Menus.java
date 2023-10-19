@@ -82,9 +82,6 @@ public class Menus {
     }
 
     public static void telaPedidos(ArrayList<Pedido> pedidos, Usuario cliente){
-        System.out.println("========== PEDIDOS ==========");
-
-        System.out.println();
 
         for (Pedido pedido : pedidos) {
             System.out.println(pedido.toString(cliente));
