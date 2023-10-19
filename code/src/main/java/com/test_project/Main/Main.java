@@ -65,6 +65,8 @@ public class Main {
                     if (cliente != null) {
                         carrinho = new Carrinho(cliente);
                         do {
+
+                            carrinho.atualizarBanco();
                             
                             new ProcessBuilder(limpar1, limpar2, limpar3).inheritIO().start().waitFor();
 
@@ -72,7 +74,6 @@ public class Main {
                                 op = 4;
                                 cliente = new Usuario(null, null, null, null, null, null, null);
                             } else{
-                                carrinho.atualizarBanco();
                                 Menus.telaUsuario();
                                 System.out.print("  >> ");
                                 op = sc.nextInt();
@@ -935,11 +936,21 @@ public class Main {
                                                         case 3:
 
                                                             sc.nextLine();
-                                                            System.out.print("\nNome da categoria: ");
-                                                            String categoria = sc.nextLine();
+                                                            System.out.println("\nSelecione uma categoria: ");
+                                                            ArrayList<String> categorias = Menus.telaCategoria(produtos);
+                                                            System.out.print("  >> ");
+                                                            int idCategoria = sc.nextInt();
+
+                                                            if (idCategoria > categorias.size() || idCategoria < 1) {
+                                                                System.out.println("Categoria inválida!");   
+                                                                System.out.println("Pressione Enter para continuar!");
+                                                                sc.nextLine();
+                                                                sc.nextLine();
+                                                                break;
+                                                            }
 
                                                             for (Produto produto : produtos) {
-                                                                if (produto.getCategoria().equals(categoria)) {
+                                                                if (produto.getCategoria().equals(categorias.get(idCategoria-1))) {
                                                                     produtosFiltrados.add(produto);
                                                                 }
                                                             }
