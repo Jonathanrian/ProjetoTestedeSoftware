@@ -214,7 +214,7 @@ public class UsuarioTest {
 
         this.cliente.cadastrar();
 
-        this.cliente.excluirUsuario(this.cliente);
+        assertTrue(this.cliente.excluirUsuario(this.cliente));
 
         try {
             Connection connection = PostgreSQLConnection.getInstance().getConnection();
