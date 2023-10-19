@@ -64,11 +64,21 @@ public class Carrinho {
 
     public boolean adicionarItem(Produto produto, int quantidade){
         try {
-            if (this.produtos.containsKey(produto)) {
-            this.produtos.put(produto, this.produtos.get(produto) + quantidade);
-            } else{
+
+            if (this.produtos.isEmpty()) {
                 this.produtos.put(produto, quantidade);
+                return true;
             }
+
+            for (Produto key : this.produtos.keySet()) {
+                if (key.getId() == produto.getId()) {
+                    this.produtos.put(key, this.produtos.get(key) + quantidade);
+                    return true;
+                }
+            }
+
+            this.produtos.put(produto, quantidade);
+
             return true;
         } catch (Exception e) {
             return false;
@@ -79,12 +89,17 @@ public class Carrinho {
     public boolean removerItem(Produto produto){
 
         try {
-            if (this.produtos.containsKey(produto)) {
-                this.produtos.remove(produto);
-                return true;
-            } else{
-                return false;
+
+            for (Produto key : this.produtos.keySet()) {
+
+                if (key.getId() == produto.getId()) {
+                    this.produtos.remove(key);
+                    return true;
+                }
+
             }
+
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -94,15 +109,20 @@ public class Carrinho {
     public boolean removerItem(Produto produto, int decremento){
 
         try {
-            if (this.produtos.containsKey(produto)) {
-                this.produtos.put(produto, this.produtos.get(produto) + decremento);
-                if (this.produtos.get(produto) == 0) {
-                    this.produtos.remove(produto);
+
+            for (Produto key : this.produtos.keySet()) {
+
+                if (key.getId() == produto.getId()) {
+                    this.produtos.put(key, this.produtos.get(key) + decremento);
+                    if (this.produtos.get(key) <= 0) {
+                        this.produtos.remove(key);
+                    }
+                    return true;
                 }
-                return true;
-            } else{
-                return false;
+
             }
+
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -125,11 +145,15 @@ public class Carrinho {
 
     public int quantidadeProduto(Produto produto){
         try {
-            if (this.produtos.containsKey(produto)) {
-                return this.produtos.get(produto);
-            } else{
-                return -1;
+
+            for (Produto key : this.produtos.keySet()) {
+                if (key.getId() == produto.getId()) {
+                    return this.produtos.get(key);
+                }
             }
+
+            return -1;
+
         } catch (Exception e) {
             return -1;
         }
