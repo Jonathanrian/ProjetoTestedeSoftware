@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Produto {
     private int id;
@@ -161,6 +162,31 @@ public class Produto {
         return sb.toString();
     }
     
-    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Produto other = (Produto) obj;
+
+        return id == other.id &&
+            Double.compare(other.preco, preco) == 0 &&
+            estoque == other.estoque &&
+            desconto == other.desconto &&
+            Objects.equals(nome, other.nome) &&
+            Objects.equals(categoria, other.categoria) &&
+            Objects.equals(descricao, other.descricao) &&
+            Objects.equals(fabricante, other.fabricante);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome, preco, categoria, estoque, descricao, fabricante, desconto);
+    }
+
 }
 
