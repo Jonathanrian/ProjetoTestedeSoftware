@@ -46,15 +46,6 @@ public class Pedido {
         this.valorTotal = valorTotal;
     }
 
-    public boolean exibirDetalhes(){
-        try {
-            //Colocar uma forma legal de imprimir os detalhes talvez?
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     public boolean finalizarCompra(Carrinho carrinho) throws Exception{
         try {
 
